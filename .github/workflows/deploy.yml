@@ -1,1 +1,43 @@
-# Local development mode - Hetzner deployments disabled.
+name: Deploy xFlix Zone Movies to Hetzner
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🚀 Checkout Codebase
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm ci
+
+      - name: 🛠️ Build Production Bundle
+        run: npm run build
+
+      - name: 🚀 Deploy to Hetzner VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          password: ${{ secrets.HETZNER_PASSWORD }}
+          port: 22
+          script: |
+            echo "Starting Hetzner Auto-Deployment..."
+            cd /var/www/xflix-movies
+            git pull origin main
+            npm install --production=false
+            npm run build
+            pm2 restart xflix-movies || pm2 start npx --name "xflix-movies" -- next start -p 3001
+            pm2 save
+            echo "Deployment Complete! https://movies.xflix.ink is live."
