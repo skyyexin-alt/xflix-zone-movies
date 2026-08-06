@@ -1,18 +1,10 @@
-# NextZone Development Workflow (Local / Offline Mode)
+# NextZone Movies - Development Guidelines
 
-This project is strictly for **local / offline use**.
+This project (`NextZone Movies`) is an independent, standalone movie streaming and viewing platform built for local development on `http://localhost:3000`.
 
-# Implicit Fix & Organize Rule
-- **Empty Message / Screenshot-Only Requests**: Whenever the user sends an image/screenshot without typing any text, automatically analyze the image for red arrows, overlapping text, cramped headers, or layout issues, and immediately fix and organize the UI elements in the codebase.
-
-When the user requests changes to the XFlix Movies Review codebase:
-1. **Make changes locally**: Edit the necessary files in the codebase.
-2. **Local Preview**: Instruct the user to preview changes on their local server (`http://localhost:3000`).
-3. **No Deployment Required**: Do not prompt for git commit/push or server deployments (Hetzner). Keep all changes local.
-
-# Clean Video Player Rule
-- **Clean Video Frame Standard**: Always use the custom chromeless XFlix Video Player Frame (`XFlixTrailerPlayer.tsx` / `CustomVideoPlayer.tsx`) for video embeds and trailers.
-- **Zero Third-Party Branding**: Ensure all video frames remain 100% clean with zero YouTube logos, zero third-party branding overlays, zero recommendation popups, and zero ad shields.
-- **XFlix Branded Controls**: Maintain top title headers with `1080p Full HD` badges and sleek custom controls across all viewports.
-
-
+# Core Rules:
+1. **100% Independent Project**: This codebase (`nextzone`) is strictly dedicated to the NextZone Movies streaming platform and operates completely separate from any review projects.
+2. **Local Preview**: All changes are tested locally on `http://localhost:3000`. No remote deployments (Hetzner/Vercel) required.
+3. **Clean Video Player Standard**: Always use custom chromeless video player frames (`NextZonePlayer` / `IntegratedPlayer`) for video embeds and movie streaming.
+4. **Zero Third-Party Branding & Ads**: Maintain 100% clean video frames and UI with zero third-party ads, zero ad shields, zero recommendation popups, and zero third-party logos.
+5. **NextZone Branding**: Maintain `NextZone Movies` top headers, `1080p Full HD` badges, and sleek modern custom video controls across all viewports.

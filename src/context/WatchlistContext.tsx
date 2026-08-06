@@ -36,6 +36,7 @@ interface WatchlistContextType {
   isLoaded: boolean;
   addToWatchlist: (item: MediaItem) => void;
   removeFromWatchlist: (id: number) => void;
+  clearWatchlist: () => void;
 }
 
 const WatchlistContext = createContext<WatchlistContextType | undefined>(undefined);
@@ -140,6 +141,10 @@ export function WatchlistProvider({ children }: { children: React.ReactNode }) {
     return { total, watching, completed, planToWatch, onHold, dropped, meanScore };
   };
 
+  const clearWatchlist = () => {
+    setWatchlist([]);
+  };
+
   return (
     <WatchlistContext.Provider
       value={{
@@ -152,6 +157,7 @@ export function WatchlistProvider({ children }: { children: React.ReactNode }) {
         isLoaded,
         addToWatchlist,
         removeFromWatchlist,
+        clearWatchlist,
       }}
     >
       {children}

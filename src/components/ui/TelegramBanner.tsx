@@ -1,36 +1,33 @@
-import { MessageCircle, ExternalLink } from 'lucide-react';
-import Link from 'next/link';
+"use client";
+
+import { Send } from 'lucide-react';
 
 export default function TelegramBanner() {
   return (
-    <div className="relative overflow-hidden rounded-2xl my-6 p-4 sm:p-5 border border-[#1e88e5]/25 bg-gradient-to-br from-[#1a2f50]/60 via-[#1565c0]/15 to-[#0d47a1]/30">
-      {/* Background glow elements */}
-      <div className="absolute top-0 right-0 w-48 sm:w-64 h-full bg-gradient-to-l from-[#1e88e5]/15 to-transparent pointer-events-none" />
-      <div className="absolute -top-4 -right-4 w-24 h-24 bg-[#1e88e5]/20 rounded-full blur-2xl pointer-events-none" />
-
-      <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3 sm:gap-4">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#1e88e5] to-[#0d47a1] rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-500/30">
-            <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-          </div>
-          <div>
-            <h3 className="text-white font-bold text-sm sm:text-base leading-tight">Join XFlix Telegram</h3>
-            <p className="text-blue-300/80 text-xs sm:text-sm mt-0.5 leading-snug max-w-xs">
-              Get notified if the site moves. First to know about updates & new links.
-            </p>
-          </div>
+    <div className="w-full my-6 bg-gradient-to-r from-[#6c5ce7]/20 via-[#1e90ff]/15 to-[#6c5ce7]/10 border border-[#6c5ce7]/30 rounded-2xl p-4 sm:p-5 shadow-xl backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="flex items-center gap-4 text-center sm:text-left">
+        <div className="w-11 h-11 rounded-xl bg-[#6c5ce7] flex items-center justify-center flex-shrink-0 shadow-lg shadow-[#6c5ce7]/30 text-white">
+          <Send className="w-5 h-5 translate-x-[-1px] translate-y-[1px]" />
         </div>
-        
-        <Link 
-          href="https://t.me/XFlixhd" 
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#1e88e5] hover:bg-[#1565c0] active:scale-95 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-blue-500/25 whitespace-nowrap"
-        >
-          <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
-          Join Group
-        </Link>
+        <div className="space-y-0.5">
+          <h3 className="text-base sm:text-lg font-bold text-white flex items-center justify-center sm:justify-start gap-2">
+            Join NextZone Telegram Group
+          </h3>
+          <p className="text-xs sm:text-sm text-zinc-300 font-normal max-w-xl">
+            If the site ever closes, this is where we'll post the new link. Be the first to know about news and updates.
+          </p>
+        </div>
       </div>
+
+      <a
+        href="https://t.me/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-2 bg-[#6c5ce7] hover:bg-[#5a49df] text-white font-bold text-sm px-6 py-2.5 rounded-xl shadow-md transition-all active:scale-95 shrink-0"
+      >
+        <Send className="w-4 h-4" />
+        <span>Join</span>
+      </a>
     </div>
   );
 }

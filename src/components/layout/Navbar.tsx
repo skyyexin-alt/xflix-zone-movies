@@ -2,489 +2,381 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import Container from '@/components/ui/Container';
+import Image from 'next/image';
 import { 
-  Film, Search, Tv, Heart, Menu, X, ChevronDown, ChevronRight, User, Sparkles, Star, Smartphone,
-  Flame, Ticket, Award, Calendar, UserCheck, Clapperboard, FileText, Users
+  Film, Search, ChevronDown, Heart, Dices, TrendingUp, Tag, Star, 
+  Layers, Globe, Tv, Calendar, PlayCircle, Clock, Radio, Menu, X,
+  Home, Sparkles, Compass, Smartphone
 } from 'lucide-react';
-import MobileBottomNav from '@/components/layout/MobileBottomNav';
-import ExploreCategoriesModal from '@/components/layout/ExploreCategoriesModal';
 import CenteredSearchModal from '@/components/layout/CenteredSearchModal';
+import RandomPickModal from '@/components/ui/RandomPickModal';
 import { useWatchlist } from '@/context/WatchlistContext';
-
-const defaultSpotlight = [
-  { rank: 1, name: 'Tom Holland', country: 'British', watchers: '28,450', image: '' },
-  { rank: 2, name: 'Matt Damon', country: 'American', watchers: '24,190', image: '' },
-  { rank: 3, name: 'Zendaya', country: 'American', watchers: '26,850', image: '' },
-];
 
 export default function Navbar() {
   const pathname = usePathname();
   const { watchlist } = useWatchlist();
+  const [browseOpen, setBrowseOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [exploreOpen, setExploreOpen] = useState(false);
-  const [exploreModalOpen, setExploreModalOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [spotlightActors, setSpotlightActors] = useState<any[]>(defaultSpotlight);
-
-  useEffect(() => {
-    async function loadSpotlightImages() {
-      const apiKey = process.env.NEXT_PUBLIC_TMDB_API_KEY || '5d067b9d81cc3970f1365e1e9862ce6b';
-      if (!apiKey) return;
-
-      try {
-        const names = ['Tom Holland', 'Matt Damon', 'Zendaya'];
-        const results = await Promise.all(
-          names.map(async (name, idx) => {
-            const res = await fetch(`https://api.themoviedb.org/3/search/person?api_key=${apiKey}&query=${encodeURIComponent(name)}`);
-            if (res.ok) {
-              const data = await res.json();
-              const person = data.results?.[0];
-              if (person && person.profile_path) {
-                return {
-                  rank: idx + 1,
-                  name: person.name,
-                  country: idx === 0 ? 'British' : 'American',
-                  watchers: idx === 0 ? '28,450' : idx === 1 ? '24,190' : '26,850',
-                  image: `https://image.tmdb.org/t/p/w185${person.profile_path}`,
-                };
-              }
-            }
-            return defaultSpotlight[idx];
-          })
-        );
-        setSpotlightActors(results);
-      } catch (e) {}
-    }
-    loadSpotlightImages();
-  }, []);
-
-  const closeExplore = () => setExploreOpen(false);
+  const [randomModalOpen, setRandomModalOpen] = useState(false);
 
   return (
     <>
-      {/* ── Top Header ── */}
-      <header
-        className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-[#0b0b1a] border-b border-violet-500/40 shadow-[0_4px_30px_rgba(0,0,0,0.6)] py-4"
-      >
-        <Container className="w-full flex items-center justify-between">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-[#0e0b1d]/95 backdrop-blur-md border-b border-white/10 py-3.5">
+        <Container className="flex items-center justify-between">
           
-          {/* Brand Logo + Main MDL Nav */}
-          <div className="flex items-center gap-8 xl:gap-10">
+          {/* Left Side: Logo & Main Navigation Menu */}
+          <div className="flex items-center gap-8">
             
-            {/* Movie Review Logo */}
-            <Link href="/" className="flex items-center gap-2.5 group flex-shrink-0">
-              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-violet-600 via-indigo-600 to-fuchsia-600 flex items-center justify-center group-hover:scale-105 transition-transform shadow-lg shadow-violet-600/40 border border-violet-400/40">
-                <Film className="w-6 h-6 text-white" />
+            {/* xFlix Zone Brand Logo */}
+            <Link href="/" className="flex items-center gap-2.5 group">
+              <div className="w-8 h-8 rounded-lg bg-[#6c5ce7] flex items-center justify-center text-white shadow-md shadow-[#6c5ce7]/40 group-hover:scale-105 transition-transform">
+                <Film className="w-4 h-4" />
               </div>
-              <div className="flex items-center gap-2">
-                <div className="flex flex-col leading-none">
-                  <span className="text-2xl font-black text-white tracking-tight">XFlix</span>
-                  <span className="text-xs font-black text-violet-400 uppercase tracking-widest">REVIEWS</span>
-                </div>
-                <span className="bg-rose-600 text-white text-xs font-black px-2 py-0.5 rounded-md shadow">
-                  v2.0
-                </span>
-              </div>
+              <span className="text-xl font-bold text-white tracking-tight">xFlix Zone</span>
             </Link>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden lg:flex items-center gap-7 xl:gap-9 text-base xl:text-lg font-black tracking-wider">
+            <nav className="hidden lg:flex items-center gap-6 text-sm font-semibold">
+              <Link 
+                href="/" 
+                className={`transition-colors py-1 ${pathname === '/' ? 'text-white font-bold' : 'text-zinc-300 hover:text-white'}`}
+              >
+                Home
+              </Link>
               
-              {/* HOME Link */}
-              <Link
-                href="/"
-                className={`transition-colors py-2 flex items-center gap-1 ${
-                  pathname === '/' ? 'text-white font-black' : 'text-zinc-300 hover:text-white'
-                }`}
+              <Link 
+                href="/movies" 
+                className={`transition-colors py-1 ${pathname === '/movies' ? 'text-white font-bold' : 'text-zinc-300 hover:text-white'}`}
               >
-                HOME
+                Movies
               </Link>
 
-              {/* EXPLORE Link & Dropdown */}
-              <div 
-                className="relative group/explore"
-                onMouseEnter={() => setExploreOpen(true)}
-                onMouseLeave={() => setExploreOpen(false)}
+              <Link 
+                href="/tv" 
+                className={`transition-colors py-1 ${pathname === '/tv' ? 'text-white font-bold' : 'text-zinc-300 hover:text-white'}`}
               >
-                <button 
-                  onClick={() => setExploreModalOpen(true)}
-                  className={`flex items-center gap-1.5 transition-colors py-2 ${
-                    pathname.startsWith('/explore') ? 'text-violet-300 font-black' : 'text-zinc-300 hover:text-white'
-                  }`}
-                >
-                  EXPLORE <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${exploreOpen ? 'rotate-180 text-violet-400' : ''}`} />
-                </button>
-
-                {/* ── 4-COLUMN MEGA DROPDOWN MENU ── */}
-                <div 
-                  className={`absolute top-full left-0 mt-2 w-[920px] bg-[#14142f] border border-white/10 rounded-2xl shadow-2xl p-7 backdrop-blur-2xl transition-all duration-200 grid grid-cols-12 gap-7 ${
-                    exploreOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'
-                  }`}
-                >
-                  {/* Column 1: Movies (FIRST Line/Column!) */}
-                  <div className="col-span-3 space-y-3.5">
-                    <h4 className="text-xs md:text-sm font-black text-violet-300 uppercase tracking-wider border-b border-white/10 pb-2.5 flex items-center gap-2">
-                      <Film className="w-4 h-4 text-violet-400" /> Movies
-                    </h4>
-                    <div className="space-y-2 text-xs md:text-sm font-bold text-zinc-300">
-                      <Link href="/explore?type=movie&sort=popular&cat=Most+Popular+Movies" onClick={closeExplore} className="flex items-center gap-2 hover:text-white hover:translate-x-1 transition-all text-white font-extrabold">
-                        <Flame className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                        <span>Most Popular Movies</span>
-                      </Link>
-                      <Link href="/explore?type=movie&sort=top_rated&cat=Top+Rated+Movies" onClick={closeExplore} className="flex items-center gap-2 hover:text-white hover:translate-x-1 transition-all">
-                        <Star className="w-3.5 h-3.5 text-amber-400 fill-current shrink-0" />
-                        <span>Top Movies</span>
-                      </Link>
-                      <Link href="/explore?type=movie&sort=newest&cat=Newest+Blockbusters" onClick={closeExplore} className="flex items-center gap-2 hover:text-white hover:translate-x-1 transition-all">
-                        <Sparkles className="w-3.5 h-3.5 text-violet-400 shrink-0" />
-                        <span>Newest Blockbusters</span>
-                      </Link>
-                      <Link href="/explore?type=movie&sort=upcoming&cat=Upcoming+Movies" onClick={closeExplore} className="flex items-center gap-2 hover:text-white hover:translate-x-1 transition-all">
-                        <Ticket className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                        <span>Upcoming Movies</span>
-                      </Link>
-                      <Link href="/explore?type=movie&sort=top_rated&cat=Movie+Reviews" onClick={closeExplore} className="flex items-center gap-2 hover:text-white hover:translate-x-1 transition-all">
-                        <Film className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-                        <span>Movie Reviews</span>
-                      </Link>
-                      <Link href="/explore?type=movie&sort=popular&cat=Recommended+Movies" onClick={closeExplore} className="flex items-center gap-2 text-violet-300 font-extrabold hover:text-white hover:translate-x-1 transition-all pt-2 border-t border-white/8">
-                        <Heart className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-                        <span>Recommendations</span>
-                      </Link>
-                    </div>
-                  </div>
-
-                  {/* Column 2: TV Shows & Series */}
-                  <div className="col-span-3 space-y-3.5">
-                    <h4 className="text-xs md:text-sm font-black text-violet-300 uppercase tracking-wider border-b border-white/10 pb-2.5 flex items-center gap-2">
-                      <Tv className="w-4 h-4 text-violet-400" /> TV Shows
-                    </h4>
-                    <div className="space-y-2 text-xs md:text-sm font-bold text-zinc-300">
-                      <Link href="/explore?type=tv&sort=popular&cat=Most+Popular+TV+Shows" onClick={closeExplore} className="flex items-center gap-2 hover:text-white hover:translate-x-1 transition-all text-white font-extrabold">
-                        <Flame className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                        <span>Most Popular Shows</span>
-                      </Link>
-                      <Link href="/explore?type=tv&sort=top_rated&cat=Top+TV+Shows+%26+Dramas" onClick={closeExplore} className="flex items-center gap-2 hover:text-white hover:translate-x-1 transition-all">
-                        <Award className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                        <span>Top Shows</span>
-                      </Link>
-                      <Link href="/explore?type=tv&genre=10764&cat=Variety+Shows" onClick={closeExplore} className="flex items-center gap-2 hover:text-white hover:translate-x-1 transition-all">
-                        <Tv className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                        <span>Variety Shows</span>
-                      </Link>
-                      <Link href="/explore?type=tv&sort=newest&cat=Newest+TV+Releases" onClick={closeExplore} className="flex items-center gap-2 hover:text-white hover:translate-x-1 transition-all">
-                        <Sparkles className="w-3.5 h-3.5 text-violet-400 shrink-0" />
-                        <span>Newest Releases</span>
-                      </Link>
-                      <Link href="/explore?type=tv&sort=upcoming&cat=Upcoming+Dramas" onClick={closeExplore} className="flex items-center gap-2 hover:text-white hover:translate-x-1 transition-all">
-                        <Calendar className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                        <span>Upcoming Dramas</span>
-                      </Link>
-                      <Link href="/explore?type=tv&sort=top_rated&cat=TV+Reviews+%26+Ratings" onClick={closeExplore} className="flex items-center gap-2 hover:text-white hover:translate-x-1 transition-all">
-                        <Star className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                        <span>Reviews & Ratings</span>
-                      </Link>
-                      <Link href="/explore?type=tv&sort=popular&cat=Recommended+For+You" onClick={closeExplore} className="flex items-center gap-2 text-violet-300 font-extrabold hover:text-white hover:translate-x-1 transition-all pt-2 border-t border-white/8">
-                        <Heart className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-                        <span>Recommended For You</span>
-                      </Link>
-                    </div>
-                  </div>
-
-                  {/* Column 3: People / Actors */}
-                  <div className="col-span-3 space-y-3.5">
-                    <h4 className="text-xs md:text-sm font-black text-violet-300 uppercase tracking-wider border-b border-white/10 pb-2.5 flex items-center gap-2">
-                      <User className="w-4 h-4 text-violet-400" /> People
-                    </h4>
-                    <div className="space-y-2 text-xs md:text-sm font-bold text-zinc-300">
-                      <Link href="/explore?cat=Top+Actors" onClick={closeExplore} className="flex items-center gap-2 hover:text-white hover:translate-x-1 transition-all">
-                        <UserCheck className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                        <span>Top Actors</span>
-                      </Link>
-                      <Link href="/explore?cat=Popular+Directors" onClick={closeExplore} className="flex items-center gap-2 hover:text-white hover:translate-x-1 transition-all">
-                        <Clapperboard className="w-3.5 h-3.5 text-violet-400 shrink-0" />
-                        <span>Popular Directors</span>
-                      </Link>
-                      <Link href="/explore?cat=Screenwriters" onClick={closeExplore} className="flex items-center gap-2 hover:text-white hover:translate-x-1 transition-all">
-                        <FileText className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                        <span>Screenwriters</span>
-                      </Link>
-                      <Link href="/explore?cat=Actor+Filmographies" onClick={closeExplore} className="flex items-center gap-2 hover:text-white hover:translate-x-1 transition-all">
-                        <Users className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                        <span>Actor Filmographies</span>
-                      </Link>
-                    </div>
-                  </div>
-
-                  {/* Column 4: Featured Spotlight Widget (With Real TMDB Actor Photos!) */}
-                  <div className="col-span-3 bg-white/4 border border-white/10 rounded-2xl p-4 flex flex-col justify-between">
-                    <div className="space-y-3.5 text-center">
-                      <span className="text-xs font-black text-amber-400 uppercase tracking-wider block border-b border-white/8 pb-2">
-                        👑 TOP FEATURED ACTORS
-                      </span>
-
-                      <div className="flex items-center justify-center gap-3 pt-1">
-                        {spotlightActors.map((actor) => (
-                          <Link 
-                            key={actor.rank} 
-                            href="/explore?cat=Top+Actors" 
-                            onClick={closeExplore}
-                            className="flex flex-col items-center group/actor"
-                          >
-                            <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-amber-400/40 bg-violet-950 flex items-center justify-center shadow-md">
-                              {actor.image ? (
-                                <Image src={actor.image} alt={actor.name} fill className="object-cover" />
-                              ) : (
-                                <span className="font-extrabold text-white text-xs">{actor.name.substring(0, 2).toUpperCase()}</span>
-                              )}
-                              <span className="absolute -top-1 -right-1 bg-amber-500 text-black text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow">
-                                #{actor.rank}
-                              </span>
-                            </div>
-                            <span className="text-xs font-extrabold text-white mt-1 truncate max-w-[70px] group-hover/actor:text-violet-300">
-                              {actor.name.split(' ')[0]}
-                            </span>
-                            <span className="text-[9px] text-zinc-400 font-semibold">{actor.watchers}</span>
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-
-                    <Link
-                      href="/explore?cat=Top+Actors"
-                      onClick={closeExplore}
-                      className="mt-4 block text-center text-xs font-black bg-violet-600/40 hover:bg-violet-600 text-violet-200 hover:text-white py-2 rounded-xl transition-all border border-violet-500/40"
-                    >
-                      View Actor Leaderboard
-                    </Link>
-                  </div>
-
-                </div>
-              </div>
-
-              {/* MOVIES REVIEW Link with green NEW badge */}
-              <Link
-                href="/lists"
-                className={`transition-colors py-2 flex items-center gap-2 ${
-                  pathname === '/lists' ? 'text-white font-black' : 'text-zinc-300 hover:text-white'
-                }`}
-              >
-                <span>MOVIES REVIEW</span>
-                <span className="bg-emerald-500 text-black text-[9px] font-black px-1.5 py-0.5 rounded-md uppercase">
-                  NEW
-                </span>
+                TV Shows
               </Link>
 
-              {/* CALENDAR Link */}
-              <Link
-                href="/upcoming"
-                className={`transition-colors py-2 flex items-center gap-1 ${
-                  pathname === '/upcoming' ? 'text-white font-black' : 'text-zinc-300 hover:text-white'
-                }`}
-              >
-                CALENDAR
-              </Link>
-
-              {/* APP Link with HOT badge */}
-              <button
+              <button 
                 onClick={() => {
                   if (typeof window !== 'undefined') {
                     window.dispatchEvent(new Event('trigger-install-popup'));
                   }
                 }}
-                className="transition-colors py-2 flex items-center gap-1.5 text-zinc-300 hover:text-white font-black"
+                className="relative flex items-center gap-1.5 text-zinc-300 hover:text-white transition-colors py-1 font-semibold text-sm"
               >
-                <span>APP</span>
-                <span className="bg-rose-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded-md uppercase">
+                <Smartphone className="w-4 h-4 text-emerald-400" />
+                <span>Install App</span>
+                <span className="bg-rose-500 text-white text-[9px] font-black px-1.5 py-0.2 rounded-full uppercase tracking-tighter shadow animate-pulse">
                   HOT
                 </span>
               </button>
 
+              {/* FlickZone Dropdown Menu: Browse */}
+              <div 
+                className="relative"
+                onMouseEnter={() => setBrowseOpen(true)}
+                onMouseLeave={() => setBrowseOpen(false)}
+              >
+                <button 
+                  onClick={() => setBrowseOpen(!browseOpen)}
+                  className="flex items-center gap-1 text-zinc-300 hover:text-white py-1 transition-colors"
+                >
+                  <span>Browse</span>
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${browseOpen ? 'rotate-180 text-[#6c5ce7]' : ''}`} />
+                </button>
+
+                {/* Browse Dropdown Menu Container */}
+                <div 
+                  className={`absolute top-full left-0 mt-2 w-64 bg-[#222255] border border-white/10 rounded-xl shadow-2xl p-3 backdrop-blur-xl transition-all duration-200 grid grid-cols-1 gap-1 ${
+                    browseOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'
+                  }`}
+                >
+                  <Link href="/trending" onClick={() => setBrowseOpen(false)} className="flex items-center gap-2.5 p-2 rounded-lg text-xs font-medium text-zinc-200 hover:text-white hover:bg-white/10 transition-all">
+                    <TrendingUp className="w-4 h-4 text-[#6c5ce7]" />
+                    <span>Trending</span>
+                  </Link>
+                  <Link href="/genre" onClick={() => setBrowseOpen(false)} className="flex items-center gap-2.5 p-2 rounded-lg text-xs font-medium text-zinc-200 hover:text-white hover:bg-white/10 transition-all">
+                    <Tag className="w-4 h-4 text-violet-400" />
+                    <span>Genres</span>
+                  </Link>
+                  <Link href="/top-rated" onClick={() => setBrowseOpen(false)} className="flex items-center gap-2.5 p-2 rounded-lg text-xs font-medium text-zinc-200 hover:text-white hover:bg-white/10 transition-all">
+                    <Star className="w-4 h-4 text-amber-400 fill-current" />
+                    <span>Top Rated</span>
+                  </Link>
+                  <Link href="/collections" onClick={() => setBrowseOpen(false)} className="flex items-center gap-2.5 p-2 rounded-lg text-xs font-medium text-zinc-200 hover:text-white hover:bg-white/10 transition-all">
+                    <Layers className="w-4 h-4 text-purple-400" />
+                    <span>Collections</span>
+                  </Link>
+                  <Link href="/country" onClick={() => setBrowseOpen(false)} className="flex items-center gap-2.5 p-2 rounded-lg text-xs font-medium text-zinc-200 hover:text-white hover:bg-white/10 transition-all">
+                    <Globe className="w-4 h-4 text-cyan-400" />
+                    <span>Countries</span>
+                  </Link>
+                  <Link href="/networks" onClick={() => setBrowseOpen(false)} className="flex items-center gap-2.5 p-2 rounded-lg text-xs font-medium text-zinc-200 hover:text-white hover:bg-white/10 transition-all">
+                    <Tv className="w-4 h-4 text-blue-400" />
+                    <span>Networks</span>
+                  </Link>
+                  <Link href="/year/2026" onClick={() => setBrowseOpen(false)} className="flex items-center gap-2.5 p-2 rounded-lg text-xs font-medium text-zinc-200 hover:text-white hover:bg-white/10 transition-all">
+                    <Calendar className="w-4 h-4 text-emerald-400" />
+                    <span>2026 Movies</span>
+                  </Link>
+                  <Link href="/now-playing" onClick={() => setBrowseOpen(false)} className="flex items-center gap-2.5 p-2 rounded-lg text-xs font-medium text-zinc-200 hover:text-white hover:bg-white/10 transition-all">
+                    <PlayCircle className="w-4 h-4 text-[#6c5ce7]" />
+                    <span>Now Playing</span>
+                  </Link>
+                  <Link href="/upcoming" onClick={() => setBrowseOpen(false)} className="flex items-center gap-2.5 p-2 rounded-lg text-xs font-medium text-zinc-200 hover:text-white hover:bg-white/10 transition-all">
+                    <Clock className="w-4 h-4 text-rose-400" />
+                    <span>Upcoming</span>
+                  </Link>
+                  <Link href="/airing-today" onClick={() => setBrowseOpen(false)} className="flex items-center gap-2.5 p-2 rounded-lg text-xs font-medium text-zinc-200 hover:text-white hover:bg-white/10 transition-all">
+                    <Radio className="w-4 h-4 text-[#6c5ce7]" />
+                    <span>Airing Today</span>
+                  </Link>
+                </div>
+              </div>
+
+              <Link 
+                href="/explore" 
+                className="text-white font-bold tracking-wider hover:opacity-80 transition-opacity"
+              >
+                FlixNetwork
+              </Link>
             </nav>
+
           </div>
 
           {/* Right Action Bar */}
-          <div className="flex items-center gap-3.5">
+          <div className="flex items-center gap-2.5">
             
-            {/* Search Input Box */}
-            <div 
+            {/* Search Button */}
+            <button
               onClick={() => setSearchOpen(true)}
-              className="relative hidden sm:flex items-center cursor-pointer bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl px-4 py-2.5 text-xs md:text-sm text-zinc-400 transition-all w-56 xl:w-72 shadow-inner"
+              className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 px-3.5 py-2 rounded-xl text-xs text-zinc-300 transition-all"
             >
-              <Search className="w-4 h-4 text-zinc-400 mr-2.5" />
-              <span className="truncate font-semibold">Find Movies, Dramas...</span>
-            </div>
-
-            {/* Mobile Search Button */}
-            <button 
-              onClick={() => setSearchOpen(true)}
-              className="p-2.5 bg-white/5 border border-white/10 rounded-xl text-zinc-400 hover:text-white sm:hidden"
-            >
-              <Search className="w-5 h-5" />
+              <Search className="w-4 h-4 opacity-70" />
+              <span className="hidden sm:inline opacity-70">Enter keywords...</span>
             </button>
 
-            {/* Language Selector Pill (EN) */}
-            <span className="hidden md:inline-block bg-white/5 border border-white/10 text-zinc-300 font-black text-xs px-3 py-1.5 rounded-xl uppercase">
-              EN
-            </span>
+            {/* Random Pick Button */}
+            <button
+              onClick={() => setRandomModalOpen(true)}
+              className="w-9 h-9 flex items-center justify-center bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-zinc-200 hover:text-white transition-all"
+              title="Random Movie Picker"
+            >
+              <Dices className="w-4 h-4" />
+            </button>
 
-            {/* Watchlist Badge Button */}
+            {/* My List / Watchlist Button */}
             <Link
               href="/watchlist"
-              className="relative px-4 py-2.5 bg-violet-600/30 border border-violet-500/40 hover:bg-violet-600/50 rounded-2xl text-violet-200 hover:text-white transition-all flex items-center gap-2 text-xs md:text-sm font-black shadow-lg shadow-violet-600/20"
-              title="My Watchlist"
+              className="w-9 h-9 flex items-center justify-center bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-zinc-200 hover:text-white transition-all relative"
+              title="My List"
             >
-              <Heart className="w-4.5 h-4.5 text-violet-400 fill-violet-500/30" />
-              <span className="hidden xl:inline">My List</span>
+              <Heart className="w-4 h-4" />
               {watchlist.length > 0 && (
-                <span className="bg-violet-600 text-white text-xs font-black px-2 py-0.5 rounded-full shadow">
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#6c5ce7] text-white text-[9px] font-bold rounded-full flex items-center justify-center">
                   {watchlist.length}
                 </span>
               )}
             </Link>
 
-            {/* Mobile Hamburger Button */}
+            {/* Mobile Hamburger Toggle */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2.5 text-zinc-400 hover:text-white rounded-xl bg-white/5 border border-white/10 lg:hidden"
+              className="p-2 text-zinc-300 hover:text-white lg:hidden"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
-
           </div>
 
         </Container>
+      </header>
 
-        {/* ── Mobile Hamburger Drawer Menu ── */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden bg-[#0e0e24]/98 border-t border-white/10 px-4 py-5 space-y-3.5 shadow-2xl backdrop-blur-xl animate-in slide-in-from-top-2 duration-300">
-            <Link
-              href="/"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-white/5 hover:bg-violet-600/30 text-sm font-extrabold text-white transition-all border border-white/8"
-            >
-              <span>HOME</span>
-              <ChevronRight className="w-4 h-4 text-violet-400" />
-            </Link>
-
-            <Link
-              href="/explore"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-white/5 hover:bg-violet-600/30 text-sm font-extrabold text-white transition-all border border-white/8"
-            >
-              <span className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-violet-400" />
-                EXPLORE DATABASE
-              </span>
-              <ChevronRight className="w-4 h-4 text-violet-400" />
-            </Link>
-
-            <Link
-              href="/explore?type=movie&sort=top_rated&cat=Top+100+Rated"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-sm font-extrabold text-amber-400 transition-all border border-amber-500/30"
-            >
-              <span className="flex items-center gap-2">
-                <Star className="w-4 h-4 fill-current text-amber-400" />
-                TOP 100 RATED
-              </span>
-              <ChevronRight className="w-4 h-4 text-amber-400" />
-            </Link>
-
-            <Link
-              href="/explore?type=movie&sort=popular&cat=Most+Popular+Movies"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-white/5 hover:bg-violet-600/30 text-sm font-extrabold text-white transition-all border border-white/8"
-            >
-              <span className="flex items-center gap-2">
-                <Film className="w-4 h-4 text-violet-400" />
-                MOVIES & BLOCKBUSTERS
-              </span>
-              <ChevronRight className="w-4 h-4 text-violet-400" />
-            </Link>
-
-            <Link
-              href="/explore?type=tv&sort=popular&cat=Top+TV+Dramas"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-white/5 hover:bg-violet-600/30 text-sm font-extrabold text-white transition-all border border-white/8"
-            >
-              <span className="flex items-center gap-2">
-                <Tv className="w-4 h-4 text-violet-400" />
-                TV SHOWS & DRAMAS
-              </span>
-              <ChevronRight className="w-4 h-4 text-violet-400" />
-            </Link>
-
-            <Link
-              href="/explore?cat=Top+Actors"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-white/5 hover:bg-violet-600/30 text-sm font-extrabold text-white transition-all border border-white/8"
-            >
-              <span className="flex items-center gap-2">
-                <User className="w-4 h-4 text-violet-400" />
-                PEOPLE & ACTORS
-              </span>
-              <ChevronRight className="w-4 h-4 text-violet-400" />
-            </Link>
-
-            <Link
-              href="/lists"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-white/5 hover:bg-violet-600/30 text-sm font-extrabold text-white transition-all border border-white/8"
-            >
-              <span>MOVIES REVIEW</span>
-              <span className="bg-emerald-500 text-black text-[9px] font-black px-1.5 py-0.5 rounded uppercase">NEW</span>
-            </Link>
-
-            <Link
-              href="/upcoming"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-white/5 hover:bg-violet-600/30 text-sm font-extrabold text-white transition-all border border-white/8"
-            >
-              <span>CALENDAR & RELEASES</span>
-              <ChevronRight className="w-4 h-4 text-violet-400" />
+      {/* Ultra-Cool Mobile Menu Glass Drawer */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden flex flex-col bg-[#090914]/98 backdrop-blur-2xl animate-in fade-in duration-200">
+          
+          {/* Mobile Menu Header */}
+          <div className="flex items-center justify-between p-4 border-b border-white/10 bg-[#14142f]">
+            <Link href="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 font-bold text-white">
+              <div className="w-8 h-8 rounded-lg bg-[#6c5ce7] flex items-center justify-center text-white shadow-md shadow-[#6c5ce7]/40">
+                <Film className="w-4 h-4" />
+              </div>
+              <span className="text-lg font-bold text-white tracking-tight">xFlix Zone</span>
             </Link>
 
             <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                if (typeof window !== 'undefined') {
-                  window.dispatchEvent(new Event('trigger-install-popup'));
-                }
-              }}
-              className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl bg-violet-600/20 hover:bg-violet-600/30 text-sm font-extrabold text-white transition-all border border-violet-500/30"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-zinc-300 hover:text-white"
             >
-              <span className="flex items-center gap-2">
-                <Smartphone className="w-4 h-4 text-violet-400" />
-                INSTALL XFLIX APP
-              </span>
-              <span className="bg-rose-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded uppercase">HOT</span>
+              <X className="w-5 h-5" />
             </button>
           </div>
-        )}
-      </header>
 
-      {/* ── Fixed Mobile Bottom Navigation Bar (Matching Screenshot!) ── */}
-      <MobileBottomNav
-        onOpenSearch={() => setSearchOpen(true)}
-        onOpenExplore={() => setExploreModalOpen(true)}
-      />
+          {/* Mobile Menu Scrollable Content */}
+          <div className="flex-1 overflow-y-auto p-5 space-y-6">
+            
+            {/* Quick Action Grid */}
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setSearchOpen(true);
+                }}
+                className="flex items-center justify-center gap-2 bg-[#6c5ce7]/20 border border-[#6c5ce7]/40 p-3 rounded-xl text-xs font-bold text-[#a29bfe] hover:bg-[#6c5ce7]/30 transition-all"
+              >
+                <Search className="w-4 h-4" />
+                <span>Search</span>
+              </button>
 
-      {/* ── Explore Categories Pop-up Modal ── */}
-      <ExploreCategoriesModal
-        isOpen={exploreModalOpen}
-        onClose={() => setExploreModalOpen(false)}
-        spotlightActors={spotlightActors}
-      />
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setRandomModalOpen(true);
+                }}
+                className="flex items-center justify-center gap-2 bg-amber-500/10 border border-amber-500/30 p-3 rounded-xl text-xs font-bold text-amber-400 hover:bg-amber-500/20 transition-all"
+              >
+                <Dices className="w-4 h-4" />
+                <span>Random Pick</span>
+              </button>
+            </div>
 
-      {/* ── Centered Instant Live Search Modal (Middle of Screen!) ── */}
+            {/* Main Navigation Items */}
+            <div className="space-y-1">
+              <span className="text-[10px] font-extrabold text-zinc-400 uppercase tracking-widest px-2">Main Navigation</span>
+              
+              <Link 
+                href="/" 
+                onClick={() => setMobileMenuOpen(false)} 
+                className={`flex items-center gap-3 p-3 rounded-xl text-sm font-bold transition-all ${
+                  pathname === '/' ? 'bg-[#6c5ce7] text-white shadow-lg shadow-[#6c5ce7]/30' : 'text-zinc-200 hover:bg-white/5'
+                }`}
+              >
+                <Home className="w-5 h-5 text-[#6c5ce7]" />
+                <span>Home</span>
+              </Link>
+
+              <Link 
+                href="/movies" 
+                onClick={() => setMobileMenuOpen(false)} 
+                className={`flex items-center gap-3 p-3 rounded-xl text-sm font-bold transition-all ${
+                  pathname === '/movies' ? 'bg-[#6c5ce7] text-white shadow-lg shadow-[#6c5ce7]/30' : 'text-zinc-200 hover:bg-white/5'
+                }`}
+              >
+                <Film className="w-5 h-5 text-blue-400" />
+                <span>Movies</span>
+              </Link>
+
+              <Link 
+                href="/tv" 
+                onClick={() => setMobileMenuOpen(false)} 
+                className={`flex items-center gap-3 p-3 rounded-xl text-sm font-bold transition-all ${
+                  pathname === '/tv' ? 'bg-[#6c5ce7] text-white shadow-lg shadow-[#6c5ce7]/30' : 'text-zinc-200 hover:bg-white/5'
+                }`}
+              >
+                <Tv className="w-5 h-5 text-cyan-400" />
+                <span>TV Shows</span>
+              </Link>
+
+              <button 
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  if (typeof window !== 'undefined') {
+                    window.dispatchEvent(new Event('trigger-install-popup'));
+                  }
+                }} 
+                className="flex items-center gap-3 p-3 rounded-xl text-sm font-bold text-zinc-200 hover:bg-white/5 transition-all w-full text-left"
+              >
+                <Smartphone className="w-5 h-5 text-emerald-400" />
+                <span>Install App</span>
+                <span className="ml-auto bg-rose-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter shadow animate-pulse">
+                  HOT
+                </span>
+              </button>
+
+              <Link 
+                href="/watchlist" 
+                onClick={() => setMobileMenuOpen(false)} 
+                className={`flex items-center gap-3 p-3 rounded-xl text-sm font-bold transition-all ${
+                  pathname === '/watchlist' ? 'bg-[#6c5ce7] text-white shadow-lg shadow-[#6c5ce7]/30' : 'text-zinc-200 hover:bg-white/5'
+                }`}
+              >
+                <Heart className="w-5 h-5 text-rose-400 fill-current" />
+                <span>My Watchlist</span>
+                {watchlist.length > 0 && (
+                  <span className="ml-auto bg-rose-500 text-white text-xs font-black px-2 py-0.5 rounded-full">
+                    {watchlist.length}
+                  </span>
+                )}
+              </Link>
+            </div>
+
+            {/* Categories & Collections */}
+            <div className="space-y-1 pt-2 border-t border-white/10">
+              <span className="text-[10px] font-extrabold text-zinc-400 uppercase tracking-widest px-2">Browse & Categories</span>
+
+              <div className="grid grid-cols-2 gap-1.5 pt-1">
+                <Link href="/trending" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-semibold text-zinc-300 hover:text-white bg-white/3 hover:bg-white/10 transition-all border border-white/5">
+                  <TrendingUp className="w-4 h-4 text-[#6c5ce7]" />
+                  <span>Trending</span>
+                </Link>
+
+                <Link href="/top-rated" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-semibold text-zinc-300 hover:text-white bg-white/3 hover:bg-white/10 transition-all border border-white/5">
+                  <Star className="w-4 h-4 text-amber-400 fill-current" />
+                  <span>Top Rated</span>
+                </Link>
+
+                <Link href="/genre" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-semibold text-zinc-300 hover:text-white bg-white/3 hover:bg-white/10 transition-all border border-white/5">
+                  <Tag className="w-4 h-4 text-violet-400" />
+                  <span>Genres</span>
+                </Link>
+
+                <Link href="/collections" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-semibold text-zinc-300 hover:text-white bg-white/3 hover:bg-white/10 transition-all border border-white/5">
+                  <Layers className="w-4 h-4 text-purple-400" />
+                  <span>Collections</span>
+                </Link>
+
+                <Link href="/country" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-semibold text-zinc-300 hover:text-white bg-white/3 hover:bg-white/10 transition-all border border-white/5">
+                  <Globe className="w-4 h-4 text-cyan-400" />
+                  <span>Countries</span>
+                </Link>
+
+                <Link href="/now-playing" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-semibold text-zinc-300 hover:text-white bg-white/3 hover:bg-white/10 transition-all border border-white/5">
+                  <PlayCircle className="w-4 h-4 text-[#6c5ce7]" />
+                  <span>Now Playing</span>
+                </Link>
+
+                <Link href="/upcoming" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-semibold text-zinc-300 hover:text-white bg-white/3 hover:bg-white/10 transition-all border border-white/5">
+                  <Clock className="w-4 h-4 text-rose-400" />
+                  <span>Upcoming</span>
+                </Link>
+
+                <Link href="/explore" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-semibold text-zinc-300 hover:text-white bg-white/3 hover:bg-white/10 transition-all border border-white/5">
+                  <Compass className="w-4 h-4 text-[#6c5ce7]" />
+                  <span>FlixNetwork</span>
+                </Link>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* Instant Search Modal */}
       <CenteredSearchModal
         isOpen={searchOpen}
         onClose={() => setSearchOpen(false)}
+      />
+
+      {/* Random Movie Picker Modal */}
+      <RandomPickModal
+        isOpen={randomModalOpen}
+        onClose={() => setRandomModalOpen(false)}
+        items={[]}
       />
     </>
   );

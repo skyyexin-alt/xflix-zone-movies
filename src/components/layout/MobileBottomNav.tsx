@@ -1,18 +1,19 @@
 "use client";
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Sparkles, Layers, Smartphone, Heart, Search } from 'lucide-react';
+import { Home, Film, Tv, Smartphone, Heart } from 'lucide-react';
 import { useWatchlist } from '@/context/WatchlistContext';
 
-interface MobileBottomNavProps {
-  onOpenSearch: () => void;
-  onOpenExplore: () => void;
-}
-
-export default function MobileBottomNav({ onOpenSearch, onOpenExplore }: MobileBottomNavProps) {
+export default function MobileBottomNav() {
   const pathname = usePathname();
   const { watchlist } = useWatchlist();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleOpenAppInstall = () => {
     if (typeof window !== 'undefined') {
@@ -22,41 +23,40 @@ export default function MobileBottomNav({ onOpenSearch, onOpenExplore }: MobileB
 
   const navItems = [
     {
-      label: 'HOME',
+      label: 'Home',
       href: '/',
       icon: Home,
       isActive: pathname === '/',
     },
     {
-      label: 'EXPLORE',
-      onClick: onOpenExplore,
-      icon: Sparkles,
-      isActive: pathname.startsWith('/explore'),
+      label: 'Movies',
+      href: '/movies',
+      icon: Film,
+      isActive: pathname === '/movies',
     },
     {
-      label: 'MOVIES REVIEW',
-      href: '/lists',
-      icon: Layers,
-      isActive: pathname === '/lists',
-      isNew: true,
+      label: 'TV Shows',
+      href: '/tv',
+      icon: Tv,
+      isActive: pathname === '/tv',
     },
     {
-      label: 'APP',
+      label: 'Install App',
       onClick: handleOpenAppInstall,
       icon: Smartphone,
       isHot: true,
     },
     {
-      label: 'WATCHLIST',
+      label: 'Watchlist',
       href: '/watchlist',
       icon: Heart,
       isActive: pathname === '/watchlist',
-      badge: watchlist.length > 0 ? watchlist.length : undefined,
+      badge: mounted && watchlist.length > 0 ? watchlist.length : undefined,
     },
   ];
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0c0c1d]/98 backdrop-blur-xl border-t border-white/10 px-1 py-1.5 flex items-center justify-around shadow-2xl">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#090914]/98 backdrop-blur-2xl border-t border-white/15 px-3 py-2.5 flex items-center justify-around shadow-[0_-10px_30px_rgba(0,0,0,0.8)] pb-safe">
       {navItems.map((item) => {
         const Icon = item.icon;
         const isButton = !!item.onClick;
@@ -66,21 +66,19 @@ export default function MobileBottomNav({ onOpenSearch, onOpenExplore }: MobileB
             <button
               key={item.label}
               onClick={item.onClick}
-              className={`relative flex flex-col items-center justify-center min-w-[54px] py-1 rounded-xl transition-all ${
-                item.isActive
-                  ? 'text-violet-400 font-black'
-                  : 'text-zinc-400 hover:text-white font-bold'
-              }`}
+              className="relative flex flex-col items-center justify-center flex-1 py-1.5 rounded-2xl transition-all active:scale-95 text-zinc-400 hover:text-white font-semibold"
             >
               <div className="relative">
-                <Icon className={`w-5 h-5 ${item.isActive ? 'text-violet-400 fill-violet-500/20' : ''}`} />
+                <Icon className="w-6 h-6 text-emerald-400" />
                 {item.isHot && (
-                  <span className="absolute -top-1 -right-2 bg-rose-600 text-white text-[7px] font-black px-1 rounded uppercase tracking-tighter shadow animate-pulse">
+                  <span className="absolute -top-1.5 -right-3 bg-rose-500 text-white text-[8px] font-black px-1.5 py-0.2 rounded-full shadow animate-pulse">
                     HOT
                   </span>
                 )}
               </div>
-              <span className="text-[9px] mt-0.5 tracking-tight font-black uppercase">{item.label}</span>
+              <span className="text-[11px] mt-1 tracking-tight font-bold text-emerald-400">
+                {item.label}
+              </span>
             </button>
           );
         }
@@ -89,38 +87,32 @@ export default function MobileBottomNav({ onOpenSearch, onOpenExplore }: MobileB
           <Link
             key={item.label}
             href={item.href || '#'}
-            className={`relative flex flex-col items-center justify-center min-w-[54px] py-1 rounded-xl transition-all ${
+            className={`relative flex flex-col items-center justify-center flex-1 py-1.5 rounded-2xl transition-all active:scale-95 ${
               item.isActive
-                ? 'text-violet-400 font-black'
-                : 'text-zinc-400 hover:text-white font-bold'
+                ? 'text-[#6c5ce7] font-black'
+                : 'text-zinc-400 hover:text-white font-semibold'
             }`}
           >
             <div className="relative">
-              <Icon className={`w-5 h-5 ${item.isActive ? 'text-violet-400 fill-violet-500/20' : ''}`} />
-              {item.isNew && (
-                <span className="absolute -top-1 -right-2 bg-emerald-500 text-black text-[7px] font-black px-1 rounded uppercase tracking-tighter shadow">
-                  NEW
-                </span>
-              )}
+              <Icon className={`w-6 h-6 transition-all duration-200 ${item.isActive ? 'text-[#6c5ce7] scale-110 drop-shadow-[0_0_10px_rgba(108,92,231,0.8)]' : ''}`} />
               {item.badge !== undefined && (
-                <span className="absolute -top-1 -right-2 bg-violet-600 text-white text-[8px] font-black px-1 rounded-full border border-violet-400 shadow">
+                <span className="absolute -top-1.5 -right-3 bg-rose-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full border border-[#090914] shadow-md animate-pulse">
                   {item.badge}
                 </span>
               )}
             </div>
-            <span className="text-[9px] mt-0.5 tracking-tight font-black uppercase">{item.label}</span>
+            
+            <span className={`text-[11px] mt-1 tracking-tight ${item.isActive ? 'font-black text-white' : 'font-bold'}`}>
+              {item.label}
+            </span>
+
+            {/* Glowing Dot Indicator for Active Tab */}
+            {item.isActive && (
+              <span className="w-1.5 h-1.5 rounded-full bg-[#6c5ce7] shadow-[0_0_10px_#6c5ce7] mt-1" />
+            )}
           </Link>
         );
       })}
-
-      {/* SEARCH Button */}
-      <button
-        onClick={onOpenSearch}
-        className="flex flex-col items-center justify-center min-w-[54px] py-1 text-zinc-400 hover:text-white font-bold transition-all"
-      >
-        <Search className="w-5 h-5 text-violet-400" />
-        <span className="text-[9px] mt-0.5 tracking-tight font-black uppercase">SEARCH</span>
-      </button>
-    </div>
+    </nav>
   );
 }

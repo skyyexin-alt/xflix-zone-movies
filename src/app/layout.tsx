@@ -3,6 +3,7 @@ import "./globals.css";
 import { Inter } from "next/font/google";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import { Providers } from "./Providers";
 import InstallAppButton from "@/components/ui/InstallAppButton";
 import StickySocialSidebar from "@/components/ui/StickySocialSidebar";
@@ -101,6 +102,7 @@ export default function RootLayout({
           <StickySocialSidebar />
           <AdskeeperNotification />
           <Footer />
+          <MobileBottomNav />
         </Providers>
       </body>
     </html>

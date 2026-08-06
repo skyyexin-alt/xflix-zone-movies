@@ -35,7 +35,7 @@ function applyDefaultSubtitle(subs: any[], originalLanguage?: string): any[] {
 }
 
 export default function IntegratedPlayer({ title, backdrop, trailerKey, tmdbId, type, seasons = [], originalLanguage }: IntegratedPlayerProps) {
-  const [activeServer, setActiveServer] = useState('vidsrc.mov');
+  const [activeServer, setActiveServer] = useState('VidSrc.fyi');
   
   // Find a valid default season (prefer Season 1 over Season 0/Specials)
   const defaultSeason = seasons.find((s: any) => s.season_number > 0) || seasons[0];
@@ -47,19 +47,36 @@ export default function IntegratedPlayer({ title, backdrop, trailerKey, tmdbId, 
   const [iframeOverlayVisible, setIframeOverlayVisible] = useState(true);
   const iframeContainerRef = useRef<HTMLDivElement>(null);
 
-  // Active Anti-Popup & Click-Hijack Shield
+  // Ultra Anti-Popup & Click-Hijack Shield
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // Intercept window.open attempts while viewing video
+    // 1. Override window.open to block & immediately close any popup window handles
     const originalOpen = window.open;
     window.open = function (...args) {
-      console.warn('[Anti-Popup Shield] Blocked click-popup attempt:', args[0]);
+      console.warn('[Anti-Popup Shield] Intercepted and blocked ad popup attempt:', args[0]);
+      try {
+        const popupWin = originalOpen.apply(window, args);
+        if (popupWin && !popupWin.closed) {
+          popupWin.close(); // Immediately close the popup window if created!
+        }
+      } catch (e) {
+        // Silently block cross-origin open
+      }
       return null;
     };
 
+    // 2. Tab refocus protection to prevent popunder tab steals
+    const handleBlur = () => {
+      setTimeout(() => {
+        window.focus();
+      }, 100);
+    };
+    window.addEventListener('blur', handleBlur);
+
     return () => {
       window.open = originalOpen;
+      window.removeEventListener('blur', handleBlur);
     };
   }, []);
 
@@ -103,8 +120,8 @@ export default function IntegratedPlayer({ title, backdrop, trailerKey, tmdbId, 
   };
 
   const servers = [
-    { name: 'vidsrc.mov', id: 'vidsrcmov', isRecommended: true },
-    { name: 'VidSrc.fyi', id: 'vidsrcfyi' },
+    { name: 'VidSrc.fyi', id: 'vidsrcfyi', isRecommended: true },
+    { name: 'vidsrc.mov', id: 'vidsrcmov' },
     { name: 'VidRock', id: 'vidrock' },
     { name: 'Vidnest', id: 'vidnest' },
     { name: 'VidKing', id: 'vidking' },
@@ -123,20 +140,20 @@ export default function IntegratedPlayer({ title, backdrop, trailerKey, tmdbId, 
   // we route them through the most stable embed API, ensuring 100% uptime for your users.
   const getEmbedUrl = () => {
     const server = servers.find(s => s.name === activeServer);
-    const serverId = server ? server.id : 'vidsrcmov';
+    const serverId = server ? server.id : 'vidsrcfyi';
     
     if (type === 'tv') {
       switch (serverId) {
-        case 'vidsrcmov': return `https://vidsrc.me/embed/tv?tmdb=${tmdbId}&season=${activeSeason}&episode=${activeEpisode}`;
-        case 'vidsrcfyi': return `https://vidsrc.in/embed/tv?tmdb=${tmdbId}&season=${activeSeason}&episode=${activeEpisode}`;
-        case 'vidrock': return `https://vidsrc.pm/embed/tv?tmdb=${tmdbId}&season=${activeSeason}&episode=${activeEpisode}`;
-        case 'vidnest': return `https://vidsrc.net/embed/tv?tmdb=${tmdbId}&season=${activeSeason}&episode=${activeEpisode}`;
+        case 'vidsrcfyi': return `https://vidsrc.me/embed/tv?tmdb=${tmdbId}&season=${activeSeason}&episode=${activeEpisode}`;
+        case 'vidsrcmov': return `https://vidsrc.cc/v2/embed/tv/${tmdbId}/${activeSeason}/${activeEpisode}`;
+        case 'vidrock': return `https://vidsrc.in/embed/tv?tmdb=${tmdbId}&season=${activeSeason}&episode=${activeEpisode}`;
+        case 'vidnest': return `https://vidsrc.pm/embed/tv?tmdb=${tmdbId}&season=${activeSeason}&episode=${activeEpisode}`;
         case 'vidking': return `https://vidsrc.xyz/embed/tv?tmdb=${tmdbId}&season=${activeSeason}&episode=${activeEpisode}`;
         case 'vidlink': return `https://vidlink.pro/tv/${tmdbId}/${activeSeason}/${activeEpisode}`;
         case 'vidfast': return `https://vidsrc.to/embed/tv/${tmdbId}/${activeSeason}/${activeEpisode}`;
         case 'vidup': return `https://vidsrc.pro/embed/tv/${tmdbId}/${activeSeason}/${activeEpisode}`;
         case 'videasy': return `https://player.smashy.stream/tv/${tmdbId}?s=${activeSeason}&e=${activeEpisode}`;
-        case '111movies': return `https://autoembed.co/tv/tmdb/${tmdbId}-${activeSeason}-${activeEpisode}`;
+        case '111movies': return `https://autoembed.cc/embed/tv/${tmdbId}/${activeSeason}/${activeEpisode}`;
         case '2embed': return `https://www.2embed.cc/embedtv/${tmdbId}&s=${activeSeason}&e=${activeEpisode}`;
         case 'multiembed': return `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1&s=${activeSeason}&e=${activeEpisode}`;
         case 'superflix': return `https://mega.smashystream.com/tv/${tmdbId}?s=${activeSeason}&e=${activeEpisode}`;
@@ -145,16 +162,16 @@ export default function IntegratedPlayer({ title, backdrop, trailerKey, tmdbId, 
       }
     } else {
       switch (serverId) {
-        case 'vidsrcmov': return `https://vidsrc.me/embed/movie?tmdb=${tmdbId}`;
-        case 'vidsrcfyi': return `https://vidsrc.in/embed/movie?tmdb=${tmdbId}`;
-        case 'vidrock': return `https://vidsrc.pm/embed/movie?tmdb=${tmdbId}`;
-        case 'vidnest': return `https://vidsrc.net/embed/movie?tmdb=${tmdbId}`;
+        case 'vidsrcfyi': return `https://vidsrc.me/embed/movie?tmdb=${tmdbId}`;
+        case 'vidsrcmov': return `https://vidsrc.cc/v2/embed/movie/${tmdbId}`;
+        case 'vidrock': return `https://vidsrc.in/embed/movie?tmdb=${tmdbId}`;
+        case 'vidnest': return `https://vidsrc.pm/embed/movie?tmdb=${tmdbId}`;
         case 'vidking': return `https://vidsrc.xyz/embed/movie?tmdb=${tmdbId}`;
         case 'vidlink': return `https://vidlink.pro/movie/${tmdbId}`;
         case 'vidfast': return `https://vidsrc.to/embed/movie/${tmdbId}`;
         case 'vidup': return `https://vidsrc.pro/embed/movie/${tmdbId}`;
         case 'videasy': return `https://player.smashy.stream/movie/${tmdbId}`;
-        case '111movies': return `https://autoembed.co/movie/tmdb/${tmdbId}`;
+        case '111movies': return `https://autoembed.cc/embed/movie/${tmdbId}`;
         case '2embed': return `https://www.2embed.cc/embed/${tmdbId}`;
         case 'multiembed': return `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1`;
         case 'superflix': return `https://mega.smashystream.com/movie/${tmdbId}`;
@@ -204,11 +221,10 @@ export default function IntegratedPlayer({ title, backdrop, trailerKey, tmdbId, 
           <div ref={iframeContainerRef} className="relative w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl border border-white/5 group">
             <iframe
               key={`${activeServer}-${activeSeason}-${activeEpisode}`}
-              className="w-full h-full absolute inset-0 bg-black"
+              className="w-full h-full absolute inset-0 bg-black border-0"
               src={getEmbedUrl()}
               title={`${title} Player`}
-              sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-presentation"
-              allow="accelerometer *; autoplay *; clipboard-write *; encrypted-media *; gyroscope *; picture-in-picture *; fullscreen *; display-capture *"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
               allowFullScreen={true}
             ></iframe>
             

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Play, Plus, Check, Star } from 'lucide-react';
+import { Play, Heart, Star } from 'lucide-react';
 import { MediaItem } from '@/lib/tmdb';
 import { useWatchlist } from '@/context/WatchlistContext';
 
@@ -13,24 +13,14 @@ interface MovieCardProps {
 }
 
 export default function MovieCard({ item, className = '', progress }: MovieCardProps) {
-  const { addToWatchlist, removeFromWatchlist, isInWatchlist, isLoaded } = useWatchlist();
   const [mounted, setMounted] = useState(false);
+  const { isInWatchlist, addToWatchlist, removeFromWatchlist, isLoaded } = useWatchlist();
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const inList = isInWatchlist(item.id);
-
-  const handleWatchlist = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (inList) {
-      removeFromWatchlist(item.id);
-    } else {
-      addToWatchlist(item);
-    }
-  };
+  if (!item || (!item.id && !item.title && !item.name)) return null;
 
   const isMovie = item.media_type === 'movie' || !item.first_air_date;
   const title = item.title || item.name || 'Untitled';
@@ -40,6 +30,31 @@ export default function MovieCard({ item, className = '', progress }: MovieCardP
   const poster = item.poster_path 
     ? `https://image.tmdb.org/t/p/w342${item.poster_path}` 
     : null;
+
+  const inList = item.id ? isInWatchlist(item.id) : false;
+
+  const handleWatchlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!item.id) return;
+    
+    if (inList) {
+      removeFromWatchlist(item.id);
+    } else {
+      addToWatchlist({
+        id: item.id,
+        title: title,
+        name: title,
+        poster_path: item.poster_path || '',
+        vote_average: item.vote_average || 0,
+        release_date: item.release_date || item.first_air_date || '',
+        media_type: isMovie ? 'movie' : 'tv',
+        overview: item.overview || '',
+        backdrop_path: item.backdrop_path || '',
+        genre_ids: item.genre_ids || []
+      });
+    }
+  };
 
   return (
     <Link href={url} className={`group/card relative flex flex-col gap-2 focus:outline-none focus:ring-2 focus:ring-violet-500 flex-shrink-0 ${className || 'w-[140px] md:w-[160px] lg:w-[175px]'}`}>
@@ -64,16 +79,21 @@ export default function MovieCard({ item, className = '', progress }: MovieCardP
           HD
         </div>
 
-        {/* Watchlist Button — always visible on mobile (touch), hover on desktop */}
+        {/* Watchlist Heart Button */}
         <button 
           onClick={handleWatchlist}
+          title={inList ? 'Remove from My List' : 'Add to My List'}
           className={`absolute top-1.5 left-1.5 z-20 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white transition-all active:scale-90
             ${mounted && inList && isLoaded
-              ? 'bg-violet-600 border-violet-500 opacity-100'
-              : 'bg-black/60 backdrop-blur-md border border-white/20 opacity-100 sm:opacity-0 sm:group-hover/card:opacity-100 hover:bg-violet-600 hover:border-violet-500'
+              ? 'bg-[#6c5ce7] border-[#6c5ce7] opacity-100 shadow-md shadow-[#6c5ce7]/50'
+              : 'bg-black/60 backdrop-blur-md border border-white/20 opacity-100 sm:opacity-0 sm:group-hover/card:opacity-100 hover:bg-[#6c5ce7] hover:border-[#6c5ce7]'
             }`}
         >
-          {mounted && isLoaded && inList ? <Check className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
+          {mounted && isLoaded && inList ? (
+            <Heart className="w-3.5 h-3.5 fill-current text-white" />
+          ) : (
+            <Heart className="w-3.5 h-3.5 text-white" />
+          )}
         </button>
 
         {/* Rating badge (bottom-left on hover) */}

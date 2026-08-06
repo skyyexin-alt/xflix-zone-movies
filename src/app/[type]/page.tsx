@@ -1,11 +1,8 @@
-import { getDiscoverMovies, getDiscoverTV, getGenres } from '@/lib/tmdb';
-import MovieCard from '@/components/ui/MovieCard';
-import CatalogFilters from '@/components/ui/CatalogFilters';
-import Pagination from '@/components/ui/Pagination';
-import BrowseMore from '@/components/ui/BrowseMore';
-import Container from '@/components/ui/Container';
-import { notFound, redirect } from 'next/navigation';
-import adultMoviesData from '@/data/adult_movies.json';
+import { getDiscoverMovies, getDiscoverTV, getPopularMovies, getTopRatedMovies, getNowPlaying, getUpcoming, getTrending, fetchAPI } from '@/lib/tmdb';
+import FlickZoneCatalog from '@/components/ui/FlickZoneCatalog';
+import { notFound } from 'next/navigation';
+
+export const dynamic = 'force-dynamic';
 
 export default async function CatalogPage({ 
   params,
@@ -16,134 +13,74 @@ export default async function CatalogPage({
 }) {
   const resolvedParams = await params;
   const resolvedSearchParams = await searchParams;
-  const type = resolvedParams.type;
+  const rawType = resolvedParams.type;
 
-  // Redirect all catalog routes to /explore for rich horizontal card layout!
-  if (type === 'top-rated') {
-    redirect('/explore?type=movie&sort=top_rated&cat=Top+100+Rated');
-  }
-  if (type === 'movies') {
-    redirect('/explore?type=movie&sort=popular&cat=Most+Popular+Movies');
-  }
-  if (type === 'trending') {
-    redirect('/explore?type=movie&sort=popular&cat=Trending+Movies');
-  }
-  if (type === 'new-releases') {
-    redirect('/explore?type=movie&sort=newest&cat=Newest+Blockbusters');
-  }
-  if (type === 'now-playing') {
-    redirect('/explore?type=movie&sort=popular&cat=In+Theaters+Now');
-  }
-  if (type === 'upcoming') {
-    redirect('/explore?type=movie&sort=upcoming&cat=Upcoming+Releases');
-  }
-  if (type === 'tv' || type === 'airing-today') {
-    redirect('/explore?type=tv&sort=popular&cat=Top+TV+Dramas');
-  }
+  const page = typeof resolvedSearchParams.page === 'string' ? parseInt(resolvedSearchParams.page, 10) : 1;
+  const sort = typeof resolvedSearchParams.sort === 'string' ? resolvedSearchParams.sort : 'popular';
+  const genre = typeof resolvedSearchParams.genre === 'string' ? resolvedSearchParams.genre : '';
+  const year = typeof resolvedSearchParams.year === 'string' ? resolvedSearchParams.year : '';
 
-  const isMovie = type !== 'tv' && type !== 'airing-today';
-  const title = type === '18-plus' ? '18+ Intimacy 🍆💦🔥' : 'Movies';
+  let mediaType: 'movie' | 'tv' = rawType === 'tv' || rawType === 'airing-today' ? 'tv' : 'movie';
+  let title = 'Popular Movies';
 
-  // Parse search params for TMDB discover endpoint
-  const page = typeof resolvedSearchParams.page === 'string' ? resolvedSearchParams.page : '1';
-  const sortBy = typeof resolvedSearchParams.sort_by === 'string' ? resolvedSearchParams.sort_by : 'popularity.desc';
-  const withGenres = typeof resolvedSearchParams.with_genres === 'string' ? resolvedSearchParams.with_genres : undefined;
-  const withCountry = typeof resolvedSearchParams.with_country === 'string' ? resolvedSearchParams.with_country : undefined;
-  const primaryReleaseYear = typeof resolvedSearchParams.primary_release_year === 'string' ? resolvedSearchParams.primary_release_year : undefined;
+  if (rawType === 'tv') title = 'TV Series';
+  else if (rawType === 'movies') title = 'Popular Movies';
+  else if (rawType === 'trending') title = 'Trending This Week';
+  else if (rawType === 'top-rated') title = 'Top Rated Movies & Shows';
+  else if (rawType === 'new-releases') title = 'New Releases';
+  else if (rawType === 'now-playing') title = 'Now Playing';
+  else if (rawType === 'upcoming') title = 'Upcoming Movies';
 
-  // Build the query object
-  const queryParams: Record<string, string> = {
-    page,
-    sort_by: sortBy,
-  };
-  if (withGenres) queryParams.with_genres = withGenres;
-  if (primaryReleaseYear) {
-    if (isMovie) queryParams.primary_release_year = primaryReleaseYear;
-    else queryParams.first_air_date_year = primaryReleaseYear;
-  }
+  let items: any[] = [];
+  let totalPages = 500;
 
-  // Inject adult params for 18+ route
-  if (type === '18-plus') {
-    queryParams.include_adult = 'true';
-    queryParams.with_keywords = '10004,158529'; // TMDB keywords for erotica, sex
-  }
-
-  let data;
-  let genresData;
-
-  if (type === '18-plus') {
-    let allMovies: any[] = [...adultMoviesData];
-    
-    // Sort locally
-    if (sortBy === 'popularity.desc') {
-      allMovies.sort((a: any, b: any) => (b.popularity || 0) - (a.popularity || 0));
-    } else if (sortBy === 'vote_average.desc') {
-      allMovies.sort((a: any, b: any) => (b.vote_average || 0) - (a.vote_average || 0));
-    } else if (sortBy === 'primary_release_date.desc') {
-      allMovies.sort((a: any, b: any) => new Date(b.release_date || 0).getTime() - new Date(a.release_date || 0).getTime());
-    }
-
-    // Filter by country (using original_language)
-    if (withCountry) {
-      allMovies = allMovies.filter((m: any) => m.original_language === withCountry);
-    }
-
-    // Filter by year
-    if (primaryReleaseYear) {
-      allMovies = allMovies.filter((m: any) => m.release_date && m.release_date.startsWith(primaryReleaseYear));
-    }
-    
-    const pageNum = parseInt(page, 10);
-    const limit = 24;
-    const startIndex = (pageNum - 1) * limit;
-    
-    data = {
-      results: allMovies.slice(startIndex, startIndex + limit),
-      total_pages: Math.ceil(allMovies.length / limit),
-      page: pageNum,
-      total_results: allMovies.length
+  try {
+    const queryParams: Record<string, string> = {
+      page: page.toString(),
     };
-    genresData = await getGenres('movie');
-  } else {
-    const [fetchedData, fetchedGenres] = await Promise.all([
-      isMovie ? getDiscoverMovies(queryParams) : getDiscoverTV(queryParams),
-      getGenres(isMovie ? 'movie' : 'tv')
-    ]);
-    data = fetchedData;
-    genresData = fetchedGenres;
-  }
+    if (genre) queryParams.with_genres = genre;
+    if (year) {
+      if (mediaType === 'movie') queryParams.primary_release_year = year;
+      else queryParams.first_air_date_year = year;
+    }
 
-  const items = data?.results || [];
-  const totalPages = data?.total_pages || 1;
-  const currentPage = parseInt(page, 10);
-  const genres = genresData?.genres || [];
+    if (sort === 'top_rated' || rawType === 'top-rated') {
+      queryParams.sort_by = 'vote_average.desc';
+      queryParams['vote_count.gte'] = '200';
+    } else if (sort === 'newest' || rawType === 'new-releases') {
+      queryParams.sort_by = 'primary_release_date.desc';
+    }
+
+    let response;
+    if (mediaType === 'movie') {
+      response = await getDiscoverMovies(queryParams);
+    } else {
+      response = await getDiscoverTV(queryParams);
+    }
+
+    items = (response?.results || []).map((item: any) => ({
+      ...item,
+      media_type: mediaType
+    }));
+
+    if (response?.total_pages) {
+      totalPages = Math.min(response.total_pages, 500);
+    }
+  } catch (e) {
+    console.error("Catalog fetch error:", e);
+  }
 
   return (
-    <Container className="py-24 min-h-screen">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">{title}</h1>
-          <p className="text-zinc-400 text-sm">Page {currentPage} of {Math.min(totalPages, 500)}</p>
-        </div>
-      </div>
-
-      <CatalogFilters genres={genres} is18Plus={type === '18-plus'} />
-
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-5">
-        {items.map((item: any) => (
-          <MovieCard key={item.id} item={item} className="w-full" />
-        ))}
-      </div>
-
-      {items.length === 0 && (
-        <div className="text-center py-20 text-zinc-400">
-          No results found matching your filters.
-        </div>
-      )}
-
-      <Pagination currentPage={currentPage} totalPages={totalPages} />
-      
-      <BrowseMore genres={genres} />
-    </Container>
+    <FlickZoneCatalog
+      title={title}
+      items={items}
+      currentPage={page}
+      totalPages={totalPages}
+      currentType={mediaType}
+      currentSort={sort}
+      currentGenre={genre}
+      currentYear={year}
+      baseUrl={`/${rawType}`}
+    />
   );
 }

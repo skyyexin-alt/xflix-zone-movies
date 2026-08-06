@@ -2,13 +2,14 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'XFlix - Watch Free Movies & TV Shows',
-    short_name: 'XFlix-Movies',
-    description: 'Watch unlimited movies and TV shows online free in HD, 1080p, 4K quality.',
+    name: 'NextZone Movies - Watch Free Movies & TV Shows',
+    short_name: 'NextZone',
+    description: 'Watch unlimited movies and TV shows online free in 1080p Full HD on NextZone Movies.',
     start_url: '/',
     display: 'standalone',
-    background_color: '#0f0f23',
-    theme_color: '#0f0f23',
+    orientation: 'portrait',
+    background_color: '#090914',
+    theme_color: '#090914',
     icons: [
       {
         src: '/icon-192.png',
