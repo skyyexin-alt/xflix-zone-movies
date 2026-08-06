@@ -8,7 +8,7 @@ import Image from 'next/image';
 import { 
   Film, Search, ChevronDown, Heart, Dices, TrendingUp, Tag, Star, 
   Layers, Globe, Tv, Calendar, PlayCircle, Clock, Radio, Menu, X,
-  Home, Sparkles, Compass, Smartphone
+  Home, Sparkles, Compass, Smartphone, ExternalLink
 } from 'lucide-react';
 import CenteredSearchModal from '@/components/layout/CenteredSearchModal';
 import RandomPickModal from '@/components/ui/RandomPickModal';
@@ -138,6 +138,18 @@ export default function Navbar() {
                   </Link>
                 </div>
               </div>
+
+              <a 
+                href="https://xflix.ink" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 bg-[#6c5ce7]/20 hover:bg-[#6c5ce7]/35 border border-[#6c5ce7]/50 text-white font-bold px-3 py-1 rounded-xl text-xs transition-all shadow-[0_0_15px_rgba(108,92,231,0.3)] group ml-1"
+                title="Go to Main XFlix Review Domain"
+              >
+                <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                <span>XFlix Review</span>
+                <ExternalLink className="w-3 h-3 text-zinc-400 group-hover:text-white" />
+              </a>
 
               <Link 
                 href="/explore" 
@@ -297,6 +309,18 @@ export default function Navbar() {
                   HOT
                 </span>
               </button>
+
+              <a 
+                href="https://xflix.ink"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 p-3 rounded-xl text-sm font-bold bg-[#6c5ce7]/20 border border-[#6c5ce7]/40 text-white hover:bg-[#6c5ce7]/30 transition-all w-full shadow-lg shadow-[#6c5ce7]/20"
+              >
+                <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
+                <span>XFlix Review</span>
+                <ExternalLink className="ml-auto w-4 h-4 text-zinc-400" />
+              </a>
 
               <Link 
                 href="/watchlist" 
