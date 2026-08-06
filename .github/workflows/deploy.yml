@@ -1,1 +1,26 @@
-# Local development mode - Hetzner deployments disabled.
+name: Auto Deploy to Hetzner VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Hetzner Server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HETZNER_HOST || '95.216.222.63' }}
+          username: ${{ secrets.HETZNER_USERNAME || 'root' }}
+          password: ${{ secrets.HETZNER_PASSWORD }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          port: 22
+          script: |
+            cd /var/www/xflix-movies
+            git pull origin main
+            npm install
+            npm run build
+            pm2 reload xflix-movies || pm2 start npx --name "xflix-movies" -- next start -p 3001
+            pm2 save
