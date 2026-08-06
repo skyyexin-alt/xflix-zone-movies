@@ -24,39 +24,39 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 bg-[#0e0b1d]/95 backdrop-blur-md border-b border-white/10 py-3.5">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-[#0e0b1d]/95 backdrop-blur-md border-b border-white/10 py-4.5">
         <Container className="flex items-center justify-between">
           
           {/* Left Side: Logo & Main Navigation Menu */}
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-10">
             
             {/* xFlix Zone Brand Logo */}
-            <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="w-8 h-8 rounded-lg bg-[#6c5ce7] flex items-center justify-center text-white shadow-md shadow-[#6c5ce7]/40 group-hover:scale-105 transition-transform">
-                <Film className="w-4 h-4" />
+            <Link href="/" className="flex items-center gap-3 group">
+              <div className="w-10 h-10 rounded-xl bg-[#6c5ce7] flex items-center justify-center text-white shadow-lg shadow-[#6c5ce7]/40 group-hover:scale-105 transition-transform">
+                <Film className="w-5 h-5" />
               </div>
-              <span className="text-xl font-bold text-white tracking-tight">xFlix Zone</span>
+              <span className="text-2xl font-black text-white tracking-tight">xFlix Zone</span>
             </Link>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden lg:flex items-center gap-6 text-sm font-semibold">
+            <nav className="hidden lg:flex items-center gap-8 text-base font-bold">
               <Link 
                 href="/" 
-                className={`transition-colors py-1 ${pathname === '/' ? 'text-white font-bold' : 'text-zinc-300 hover:text-white'}`}
+                className={`transition-colors py-1.5 ${pathname === '/' ? 'text-white font-extrabold' : 'text-zinc-300 hover:text-white'}`}
               >
                 Home
               </Link>
               
               <Link 
                 href="/movies" 
-                className={`transition-colors py-1 ${pathname === '/movies' ? 'text-white font-bold' : 'text-zinc-300 hover:text-white'}`}
+                className={`transition-colors py-1.5 ${pathname === '/movies' ? 'text-white font-extrabold' : 'text-zinc-300 hover:text-white'}`}
               >
                 Movies
               </Link>
 
               <Link 
                 href="/tv" 
-                className={`transition-colors py-1 ${pathname === '/tv' ? 'text-white font-bold' : 'text-zinc-300 hover:text-white'}`}
+                className={`transition-colors py-1.5 ${pathname === '/tv' ? 'text-white font-extrabold' : 'text-zinc-300 hover:text-white'}`}
               >
                 TV Shows
               </Link>
@@ -67,11 +67,11 @@ export default function Navbar() {
                     window.dispatchEvent(new Event('trigger-install-popup'));
                   }
                 }}
-                className="relative flex items-center gap-1.5 text-zinc-300 hover:text-white transition-colors py-1 font-semibold text-sm"
+                className="relative flex items-center gap-2 text-zinc-300 hover:text-white transition-colors py-1.5 font-bold text-base"
               >
-                <Smartphone className="w-4 h-4 text-emerald-400" />
+                <Smartphone className="w-5 h-5 text-emerald-400" />
                 <span>Install App</span>
-                <span className="bg-rose-500 text-white text-[9px] font-black px-1.5 py-0.2 rounded-full uppercase tracking-tighter shadow animate-pulse">
+                <span className="bg-rose-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter shadow animate-pulse">
                   HOT
                 </span>
               </button>
@@ -84,76 +84,75 @@ export default function Navbar() {
               >
                 <button 
                   onClick={() => setBrowseOpen(!browseOpen)}
-                  className="flex items-center gap-1 text-zinc-300 hover:text-white py-1 transition-colors"
+                  className="flex items-center gap-1.5 text-zinc-300 hover:text-white py-1.5 transition-colors font-bold text-base"
                 >
                   <span>Browse</span>
-                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${browseOpen ? 'rotate-180 text-[#6c5ce7]' : ''}`} />
+                  <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${browseOpen ? 'rotate-180 text-[#6c5ce7]' : ''}`} />
                 </button>
 
-                {/* Browse Dropdown Menu Container */}
-                <div 
-                  className={`absolute top-full left-0 mt-2 w-64 bg-[#222255] border border-white/10 rounded-xl shadow-2xl p-3 backdrop-blur-xl transition-all duration-200 grid grid-cols-1 gap-1 ${
-                    browseOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'
-                  }`}
-                >
-                  <Link href="/trending" onClick={() => setBrowseOpen(false)} className="flex items-center gap-2.5 p-2 rounded-lg text-xs font-medium text-zinc-200 hover:text-white hover:bg-white/10 transition-all">
-                    <TrendingUp className="w-4 h-4 text-[#6c5ce7]" />
-                    <span>Trending</span>
-                  </Link>
-                  <Link href="/genre" onClick={() => setBrowseOpen(false)} className="flex items-center gap-2.5 p-2 rounded-lg text-xs font-medium text-zinc-200 hover:text-white hover:bg-white/10 transition-all">
-                    <Tag className="w-4 h-4 text-violet-400" />
-                    <span>Genres</span>
-                  </Link>
-                  <Link href="/top-rated" onClick={() => setBrowseOpen(false)} className="flex items-center gap-2.5 p-2 rounded-lg text-xs font-medium text-zinc-200 hover:text-white hover:bg-white/10 transition-all">
-                    <Star className="w-4 h-4 text-amber-400 fill-current" />
-                    <span>Top Rated</span>
-                  </Link>
-                  <Link href="/collections" onClick={() => setBrowseOpen(false)} className="flex items-center gap-2.5 p-2 rounded-lg text-xs font-medium text-zinc-200 hover:text-white hover:bg-white/10 transition-all">
-                    <Layers className="w-4 h-4 text-purple-400" />
-                    <span>Collections</span>
-                  </Link>
-                  <Link href="/country" onClick={() => setBrowseOpen(false)} className="flex items-center gap-2.5 p-2 rounded-lg text-xs font-medium text-zinc-200 hover:text-white hover:bg-white/10 transition-all">
-                    <Globe className="w-4 h-4 text-cyan-400" />
-                    <span>Countries</span>
-                  </Link>
-                  <Link href="/networks" onClick={() => setBrowseOpen(false)} className="flex items-center gap-2.5 p-2 rounded-lg text-xs font-medium text-zinc-200 hover:text-white hover:bg-white/10 transition-all">
-                    <Tv className="w-4 h-4 text-blue-400" />
-                    <span>Networks</span>
-                  </Link>
-                  <Link href="/year/2026" onClick={() => setBrowseOpen(false)} className="flex items-center gap-2.5 p-2 rounded-lg text-xs font-medium text-zinc-200 hover:text-white hover:bg-white/10 transition-all">
-                    <Calendar className="w-4 h-4 text-emerald-400" />
-                    <span>2026 Movies</span>
-                  </Link>
-                  <Link href="/now-playing" onClick={() => setBrowseOpen(false)} className="flex items-center gap-2.5 p-2 rounded-lg text-xs font-medium text-zinc-200 hover:text-white hover:bg-white/10 transition-all">
-                    <PlayCircle className="w-4 h-4 text-[#6c5ce7]" />
-                    <span>Now Playing</span>
-                  </Link>
-                  <Link href="/upcoming" onClick={() => setBrowseOpen(false)} className="flex items-center gap-2.5 p-2 rounded-lg text-xs font-medium text-zinc-200 hover:text-white hover:bg-white/10 transition-all">
-                    <Clock className="w-4 h-4 text-rose-400" />
-                    <span>Upcoming</span>
-                  </Link>
-                  <Link href="/airing-today" onClick={() => setBrowseOpen(false)} className="flex items-center gap-2.5 p-2 rounded-lg text-xs font-medium text-zinc-200 hover:text-white hover:bg-white/10 transition-all">
-                    <Radio className="w-4 h-4 text-[#6c5ce7]" />
-                    <span>Airing Today</span>
-                  </Link>
-                </div>
+                {/* Dropdown Card */}
+                {browseOpen && (
+                  <div className="absolute top-full left-0 w-52 bg-[#16122b]/98 border border-white/15 rounded-2xl shadow-2xl p-2.5 backdrop-blur-xl animate-in fade-in duration-150 z-50">
+                    <Link href="/genre/action" onClick={() => setBrowseOpen(false)} className="flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-semibold text-zinc-200 hover:text-white hover:bg-white/10 transition-all">
+                      <TrendingUp className="w-4 h-4 text-emerald-400" />
+                      <span>Action Movies</span>
+                    </Link>
+                    <Link href="/genre/comedy" onClick={() => setBrowseOpen(false)} className="flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-semibold text-zinc-200 hover:text-white hover:bg-white/10 transition-all">
+                      <Tag className="w-4 h-4 text-amber-400" />
+                      <span>Comedy Movies</span>
+                    </Link>
+                    <Link href="/genre/drama" onClick={() => setBrowseOpen(false)} className="flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-semibold text-zinc-200 hover:text-white hover:bg-white/10 transition-all">
+                      <Star className="w-4 h-4 text-yellow-400" />
+                      <span>Drama Movies</span>
+                    </Link>
+                    <Link href="/genre/sci-fi" onClick={() => setBrowseOpen(false)} className="flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-semibold text-zinc-200 hover:text-white hover:bg-white/10 transition-all">
+                      <Layers className="w-4 h-4 text-purple-400" />
+                      <span>Sci-Fi & Fantasy</span>
+                    </Link>
+                    <div className="my-1 border-t border-white/10" />
+                    <Link href="/country" onClick={() => setBrowseOpen(false)} className="flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-semibold text-zinc-200 hover:text-white hover:bg-white/10 transition-all">
+                      <Globe className="w-4 h-4 text-cyan-400" />
+                      <span>Countries</span>
+                    </Link>
+                    <Link href="/networks" onClick={() => setBrowseOpen(false)} className="flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-semibold text-zinc-200 hover:text-white hover:bg-white/10 transition-all">
+                      <Tv className="w-4 h-4 text-blue-400" />
+                      <span>Networks</span>
+                    </Link>
+                    <Link href="/year/2026" onClick={() => setBrowseOpen(false)} className="flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-semibold text-zinc-200 hover:text-white hover:bg-white/10 transition-all">
+                      <Calendar className="w-4 h-4 text-emerald-400" />
+                      <span>2026 Movies</span>
+                    </Link>
+                    <Link href="/now-playing" onClick={() => setBrowseOpen(false)} className="flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-semibold text-zinc-200 hover:text-white hover:bg-white/10 transition-all">
+                      <PlayCircle className="w-4 h-4 text-[#6c5ce7]" />
+                      <span>Now Playing</span>
+                    </Link>
+                    <Link href="/upcoming" onClick={() => setBrowseOpen(false)} className="flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-semibold text-zinc-200 hover:text-white hover:bg-white/10 transition-all">
+                      <Clock className="w-4 h-4 text-rose-400" />
+                      <span>Upcoming</span>
+                    </Link>
+                    <Link href="/airing-today" onClick={() => setBrowseOpen(false)} className="flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-semibold text-zinc-200 hover:text-white hover:bg-white/10 transition-all">
+                      <Radio className="w-4 h-4 text-[#6c5ce7]" />
+                      <span>Airing Today</span>
+                    </Link>
+                  </div>
+                )}
               </div>
 
               <a 
                 href="https://xflix.ink" 
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 bg-[#6c5ce7]/20 hover:bg-[#6c5ce7]/35 border border-[#6c5ce7]/50 text-white font-bold px-3 py-1 rounded-xl text-xs transition-all shadow-[0_0_15px_rgba(108,92,231,0.3)] group ml-1"
+                className="flex items-center gap-2 bg-[#6c5ce7]/20 hover:bg-[#6c5ce7]/35 border border-[#6c5ce7]/50 text-white font-extrabold px-3.5 py-1.5 rounded-xl text-sm transition-all shadow-[0_0_15px_rgba(108,92,231,0.3)] group"
                 title="Go to Main XFlix Review Domain"
               >
-                <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
                 <span>XFlix Review</span>
-                <ExternalLink className="w-3 h-3 text-zinc-400 group-hover:text-white" />
+                <ExternalLink className="w-3.5 h-3.5 text-zinc-300 group-hover:text-white" />
               </a>
 
               <Link 
                 href="/explore" 
-                className="text-white font-bold tracking-wider hover:opacity-80 transition-opacity"
+                className="text-white font-extrabold tracking-wider hover:opacity-80 transition-opacity"
               >
                 FlixNetwork
               </Link>
@@ -162,24 +161,24 @@ export default function Navbar() {
           </div>
 
           {/* Right Action Bar */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-3">
             
             {/* Search Button */}
             <button
               onClick={() => setSearchOpen(true)}
-              className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 px-3.5 py-2 rounded-xl text-xs text-zinc-300 transition-all"
+              className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2.5 rounded-xl text-sm text-zinc-300 transition-all"
             >
-              <Search className="w-4 h-4 opacity-70" />
-              <span className="hidden sm:inline opacity-70">Enter keywords...</span>
+              <Search className="w-4.5 h-4.5 opacity-70" />
+              <span className="hidden sm:inline opacity-70 font-medium">Enter keywords...</span>
             </button>
 
             {/* Random Pick Button */}
             <button
               onClick={() => setRandomModalOpen(true)}
-              className="w-9 h-9 flex items-center justify-center bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-zinc-200 hover:text-white transition-all"
+              className="w-10 h-10 flex items-center justify-center bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-zinc-200 hover:text-white transition-all"
               title="Random Movie Picker"
             >
-              <Dices className="w-4 h-4" />
+              <Dices className="w-5 h-5" />
             </button>
 
             {/* My List / Watchlist Button */}
