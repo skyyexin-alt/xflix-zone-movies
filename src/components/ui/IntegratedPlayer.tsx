@@ -255,9 +255,16 @@ export default function IntegratedPlayer({ title, backdrop, trailerKey, tmdbId, 
         {/* Server Selection Section */}
         <div className="bg-[#222255]/40 border border-white/5 rounded-xl p-4 md:p-6 flex flex-col gap-4">
           {/* Active Anti-Popup Protection Banner */}
-          <div className="flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-lg p-3 text-sm font-medium">
-            <ShieldCheck className="w-5 h-5 flex-shrink-0 text-emerald-400" />
-            <p><span className="font-bold text-white">Built-in Anti-Popup Shield Active</span> — Player clicks, ads, and redirection popups are automatically blocked.</p>
+          <div className="flex items-start gap-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-lg p-3 text-xs md:text-sm font-medium">
+            <ShieldCheck className="w-5 h-5 flex-shrink-0 text-emerald-400 mt-0.5" />
+            <div className="flex flex-col gap-1">
+              <p>
+                <span className="font-bold text-white">Built-in Anti-Popup Shield Active</span> — Player clicks, ads, and redirection popups are automatically blocked.
+              </p>
+              <p className="text-emerald-300/90 text-xs leading-relaxed">
+                💡 <span className="font-semibold text-emerald-200">Viewer Note:</span> If a third-party video server opens an ad tab when you click play, simply close that tab and switch the player to <span className="font-semibold text-white underline decoration-emerald-400/50">Full Screen</span> for an ad-free viewing experience!
+              </p>
+            </div>
           </div>
 
           <div>

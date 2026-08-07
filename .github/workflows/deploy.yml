@@ -40,9 +40,9 @@ jobs:
             git fetch --all
             git reset --hard origin/main || git pull origin main --force
             npm install --production=false
-            rm -rf .next
             npm run build
-            pm2 restart xflix-movies || pm2 reload xflix-movies --update-env || pm2 start npx --name "xflix-movies" -- next start -p 3001
+            pm2 delete xflix-movies || true
+            pm2 start npm --name "xflix-movies" -- start -- -p 3001 || pm2 start npx --name "xflix-movies" -- next start -p 3001
             pm2 save
             systemctl reload nginx || systemctl restart nginx || true
             echo "Deployment Complete! https://movies.xflix.ink is live."
