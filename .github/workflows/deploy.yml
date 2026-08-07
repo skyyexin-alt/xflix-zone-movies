@@ -35,8 +35,10 @@ jobs:
           script: |
             echo "Starting Hetzner Auto-Deployment..."
             cd /var/www/xflix-movies
-            git fetch origin main
-            git reset --hard origin/main
+            git config --global --add safe.directory /var/www/xflix-movies || true
+            git checkout -f main || true
+            git fetch --all
+            git reset --hard origin/main || git pull origin main --force
             npm install --production=false
             rm -rf .next
             npm run build
