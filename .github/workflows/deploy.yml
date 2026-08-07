@@ -35,9 +35,12 @@ jobs:
           script: |
             echo "Starting Hetzner Auto-Deployment..."
             cd /var/www/xflix-movies
-            git pull origin main
+            git fetch origin main
+            git reset --hard origin/main
             npm install --production=false
+            rm -rf .next
             npm run build
-            pm2 restart xflix-movies || pm2 start npx --name "xflix-movies" -- next start -p 3001
+            pm2 restart xflix-movies || pm2 reload xflix-movies --update-env || pm2 start npx --name "xflix-movies" -- next start -p 3001
             pm2 save
+            systemctl reload nginx || systemctl restart nginx || true
             echo "Deployment Complete! https://movies.xflix.ink is live."
