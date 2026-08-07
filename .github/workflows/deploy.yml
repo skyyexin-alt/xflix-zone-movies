@@ -64,16 +64,21 @@ jobs:
             rm -rf .next
             npm run build
 
-            echo "--> Restarting PM2 process..."
+            # Detect proxy port from Nginx configuration for movies.xflix.ink
+            DETECTED_PORT=$(grep -rh "proxy_pass" /etc/nginx/ 2>/dev/null | grep -oE "127\.0\.0\.1:[0-9]+|localhost:[0-9]+" | head -n 1 | cut -d':' -f2)
+            PORT_TO_USE="${DETECTED_PORT:-3001}"
+            echo "--> Detected Nginx target port: $PORT_TO_USE"
+
+            echo "--> Restarting PM2 process on port $PORT_TO_USE..."
             pm2 delete xflix-movies || true
             pm2 delete nextzone || true
-            
-            # Start on both port 3001 and port 3000 fallback to guarantee nginx proxy connection
-            pm2 start npm --name "xflix-movies" -- start -- -p 3001 || pm2 start npx --name "xflix-movies" -- next start -p 3001 || pm2 start npm --name "xflix-movies" -- start
-            pm2 save || true
+            pm2 delete all || true
+
+            PORT=$PORT_TO_USE pm2 start node_modules/next/dist/bin/next --name "xflix-movies" -- start -p $PORT_TO_USE || PORT=$PORT_TO_USE pm2 start npm --name "xflix-movies" -- start -- -p $PORT_TO_USE
+            pm2 save --force || true
 
             echo "--> Reloading Nginx web server..."
             systemctl reload nginx || systemctl restart nginx || true
             echo "=================================================="
-            echo "🎉 DEPLOYMENT COMPLETE! https://movies.xflix.ink is live."
+            echo "🎉 DEPLOYMENT COMPLETE! https://movies.xflix.ink is live on port $PORT_TO_USE."
             echo "=================================================="
