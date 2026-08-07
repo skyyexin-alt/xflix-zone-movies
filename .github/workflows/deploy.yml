@@ -42,9 +42,9 @@ jobs:
             echo "🚀 STARTING HETZNER AUTO-DEPLOYMENT FOR NEXTZONE"
             echo "=================================================="
 
-            TARGET_DIR="/var/www/xflix-movies"
+            TARGET_DIR="/var/www/xflix-zone-movies"
             if [ ! -d "$TARGET_DIR" ]; then
-              FOUND_DIR=$(find /var/www /root /home /opt -name "xflix-movies" -o -name "nextzone" -o -name "xflix" 2>/dev/null | head -n 1)
+              FOUND_DIR=$(find /var/www /root /home /opt -name "xflix-zone-movies" -o -name "xflix-movies" -o -name "nextzone" -o -name "xflix" 2>/dev/null | head -n 1)
               if [ -n "$FOUND_DIR" ]; then
                 TARGET_DIR="$FOUND_DIR"
               fi
@@ -70,11 +70,12 @@ jobs:
             echo "--> Detected Nginx target port: $PORT_TO_USE"
 
             echo "--> Restarting PM2 process on port $PORT_TO_USE..."
+            pm2 delete xflix-zone-movies || true
             pm2 delete xflix-movies || true
             pm2 delete nextzone || true
             pm2 delete all || true
 
-            PORT=$PORT_TO_USE pm2 start node_modules/next/dist/bin/next --name "xflix-movies" -- start -p $PORT_TO_USE || PORT=$PORT_TO_USE pm2 start npm --name "xflix-movies" -- start -- -p $PORT_TO_USE
+            PORT=$PORT_TO_USE pm2 start node_modules/next/dist/bin/next --name "xflix-zone-movies" -- start -p $PORT_TO_USE || PORT=$PORT_TO_USE pm2 start npm --name "xflix-zone-movies" -- start -- -p $PORT_TO_USE
             pm2 save --force || true
 
             echo "--> Reloading Nginx web server..."
