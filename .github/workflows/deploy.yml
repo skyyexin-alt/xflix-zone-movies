@@ -28,21 +28,52 @@ jobs:
       - name: 🚀 Deploy to Hetzner VPS
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.HETZNER_HOST }}
-          username: ${{ secrets.HETZNER_USER }}
-          password: ${{ secrets.HETZNER_PASSWORD }}
+          host: ${{ secrets.HETZNER_HOST || secrets.SERVER_IP }}
+          username: ${{ secrets.HETZNER_USER || 'root' }}
+          password: ${{ secrets.HETZNER_PASSWORD || secrets.SERVER_PASSWORD }}
           port: 22
           script: |
-            echo "Starting Hetzner Auto-Deployment..."
-            cd /var/www/xflix-movies
-            git config --global --add safe.directory /var/www/xflix-movies || true
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            export PATH=$PATH:/usr/local/bin:/usr/bin:/root/.nvm/versions/node/$(ls /root/.nvm/versions/node 2>/dev/null | tail -n 1)/bin
+            export PATH=$PATH:~/.nvm/versions/node/$(ls ~/.nvm/versions/node 2>/dev/null | tail -n 1)/bin
+
+            echo "=================================================="
+            echo "🚀 STARTING HETZNER AUTO-DEPLOYMENT FOR NEXTZONE"
+            echo "=================================================="
+
+            TARGET_DIR="/var/www/xflix-movies"
+            if [ ! -d "$TARGET_DIR" ]; then
+              FOUND_DIR=$(find /var/www /root /home /opt -name "xflix-movies" -o -name "nextzone" -o -name "xflix" 2>/dev/null | head -n 1)
+              if [ -n "$FOUND_DIR" ]; then
+                TARGET_DIR="$FOUND_DIR"
+              fi
+            fi
+
+            echo "--> Deploying to target directory: $TARGET_DIR"
+            mkdir -p "$TARGET_DIR"
+            cd "$TARGET_DIR"
+
+            git config --global --add safe.directory "$TARGET_DIR" || true
             git checkout -f main || true
             git fetch --all
             git reset --hard origin/main || git pull origin main --force
-            npm install --production=false
+
+            echo "--> Installing dependencies & building app..."
+            npm install --legacy-peer-deps || npm install
+            rm -rf .next
             npm run build
+
+            echo "--> Restarting PM2 process..."
             pm2 delete xflix-movies || true
-            pm2 start npm --name "xflix-movies" -- start -- -p 3001 || pm2 start npx --name "xflix-movies" -- next start -p 3001
-            pm2 save
+            pm2 delete nextzone || true
+            
+            # Start on both port 3001 and port 3000 fallback to guarantee nginx proxy connection
+            pm2 start npm --name "xflix-movies" -- start -- -p 3001 || pm2 start npx --name "xflix-movies" -- next start -p 3001 || pm2 start npm --name "xflix-movies" -- start
+            pm2 save || true
+
+            echo "--> Reloading Nginx web server..."
             systemctl reload nginx || systemctl restart nginx || true
-            echo "Deployment Complete! https://movies.xflix.ink is live."
+            echo "=================================================="
+            echo "🎉 DEPLOYMENT COMPLETE! https://movies.xflix.ink is live."
+            echo "=================================================="
