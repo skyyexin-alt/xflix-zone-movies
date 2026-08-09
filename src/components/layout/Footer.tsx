@@ -1,6 +1,7 @@
 "use client";
 
 import Link from 'next/link';
+import Script from 'next/script';
 import Container from '@/components/ui/Container';
 import { Film } from 'lucide-react';
 
@@ -84,9 +85,17 @@ export default function Footer() {
           <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
         </div>
 
-        {/* Copyright Bottom Bar */}
-        <div className="text-center pt-2 text-xs text-zinc-500">
+        {/* Copyright & Visitor Counter */}
+        <div className="text-center pt-2 text-xs text-zinc-500 space-y-2">
           <p>&copy; {currentYear} NextZone Movies. All rights reserved. This site does not store any files on its server.</p>
+
+          {/* Live Visitor Counter Widget */}
+          <div className="flex justify-center pt-2">
+            <Script id="_wauset" strategy="afterInteractive">
+              {`var _wau = _wau || []; _wau.push(["dynamic", "s7tc6l2q7r", "set", "c4302bffffff", "small"]);`}
+            </Script>
+            <Script src="https://waust.at/d.js" strategy="afterInteractive" />
+          </div>
         </div>
       </Container>
     </footer>
