@@ -31,6 +31,7 @@ jobs:
           host: ${{ secrets.HETZNER_HOST || secrets.SERVER_IP }}
           username: ${{ secrets.HETZNER_USER || 'root' }}
           password: ${{ secrets.HETZNER_PASSWORD || secrets.SERVER_PASSWORD }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
           port: 22
           script: |
             export NVM_DIR="$HOME/.nvm"
