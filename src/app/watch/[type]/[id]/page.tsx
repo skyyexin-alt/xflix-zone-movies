@@ -153,7 +153,7 @@ export default async function WatchPage({
             </div>
 
             {/* Adskeeper Widget Under You May Also Like Posters */}
-            <AdskeeperWidget widgetId="2066162" />
+            <AdskeeperWidget widgetId="1106781" />
           </div>
         )}
 

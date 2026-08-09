@@ -15,6 +15,11 @@ export default function AdskeeperWidget({
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    try {
+      (window as any)._mgq = (window as any)._mgq || [];
+      (window as any)._mgq.push(["_mgc.load"]);
+    } catch (e) {}
+
     const enforceTwoColumns = () => {
       if (!containerRef.current) return;
       const widgetDiv = containerRef.current.querySelector('[data-type="_mgwidget"]');
@@ -77,7 +82,7 @@ export default function AdskeeperWidget({
       observer.disconnect();
       clearInterval(interval);
     };
-  }, []);
+  }, [widgetId]);
 
   return (
     <div
@@ -158,21 +163,9 @@ export default function AdskeeperWidget({
       />
 
       <Script
-        id="adskeeper-site-script-1106781"
-        src="https://jsc.adskeeper.com/site/1106781.js"
-        strategy="afterInteractive"
-      />
-      <Script
         id={`adskeeper-site-script-${widgetId}`}
         src={`https://jsc.adskeeper.com/site/${widgetId}.js`}
         strategy="afterInteractive"
-      />
-      <Script
-        id={`adskeeper-init-${widgetId}`}
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: `(function(w,q){w[q]=w[q]||[];w[q].push(["_mgc.load"])})(window,"_mgq");`,
-        }}
       />
     </div>
   );
