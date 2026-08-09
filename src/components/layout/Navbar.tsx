@@ -61,21 +61,6 @@ export default function Navbar() {
                 TV Shows
               </Link>
 
-              <button 
-                onClick={() => {
-                  if (typeof window !== 'undefined') {
-                    window.dispatchEvent(new Event('trigger-install-popup'));
-                  }
-                }}
-                className="relative flex items-center gap-2 text-zinc-300 hover:text-white transition-colors py-1.5 font-bold text-base"
-              >
-                <Smartphone className="w-5 h-5 text-emerald-400" />
-                <span>Install App</span>
-                <span className="bg-rose-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter shadow animate-pulse">
-                  HOT
-                </span>
-              </button>
-
               {/* FlickZone Dropdown Menu: Browse */}
               <div 
                 className="relative"
@@ -137,18 +122,6 @@ export default function Navbar() {
                   </div>
                 )}
               </div>
-
-              <a 
-                href="https://xflix.ink" 
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 bg-[#6c5ce7]/20 hover:bg-[#6c5ce7]/35 border border-[#6c5ce7]/50 text-white font-extrabold px-3.5 py-1.5 rounded-xl text-sm transition-all shadow-[0_0_15px_rgba(108,92,231,0.3)] group"
-                title="Go to Main XFlix Review Domain"
-              >
-                <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-                <span>XFlix Review</span>
-                <ExternalLink className="w-3.5 h-3.5 text-zinc-300 group-hover:text-white" />
-              </a>
 
               <Link 
                 href="/explore" 
