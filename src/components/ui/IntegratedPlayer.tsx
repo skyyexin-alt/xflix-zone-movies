@@ -43,7 +43,7 @@ export default function IntegratedPlayer({ title, backdrop, trailerKey, tmdbId, 
   const [activeEpisode, setActiveEpisode] = useState<number>(1);
   const [isSeasonDropdownOpen, setIsSeasonDropdownOpen] = useState(false);
   const [streamData, setStreamData] = useState<{ url: string, subs: any[] } | null>(null);
-  const [isStreamLoading, setIsStreamLoading] = useState(true);
+  const [isStreamLoading, setIsStreamLoading] = useState(false);
   const [iframeOverlayVisible, setIframeOverlayVisible] = useState(false);
   const iframeContainerRef = useRef<HTMLDivElement>(null);
 
@@ -71,32 +71,23 @@ export default function IntegratedPlayer({ title, backdrop, trailerKey, tmdbId, 
     };
   }, []);
 
-  // Fetch the direct stream URL from our API bridge
+  // Fetch direct HLS stream URL asynchronously if available
   useEffect(() => {
     async function fetchStream() {
-      setIsStreamLoading(true);
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 4000); // Fast 4-second fallback
-
       try {
         const queryParams = type === 'tv' 
           ? `?id=${tmdbId}&type=tv&s=${activeSeason}&e=${activeEpisode}`
           : `?id=${tmdbId}&type=movie`;
           
-        const res = await fetch(`/api/stream${queryParams}`, { signal: controller.signal });
-        clearTimeout(timeoutId);
+        const res = await fetch(`/api/stream${queryParams}`);
         const data = await res.json();
         
         if (data.streamUrl) {
           const processedSubs = applyDefaultSubtitle(data.subtitles || [], originalLanguage);
           setStreamData({ url: data.streamUrl, subs: processedSubs });
-        } else {
-          setStreamData(null); // No stream found by scraper, fallback to iframe
         }
       } catch (err) {
-        setStreamData(null);
-      } finally {
-        setIsStreamLoading(false);
+        // Silently fallback to fast iframe player
       }
     }
     
