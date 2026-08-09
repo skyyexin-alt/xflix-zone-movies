@@ -4,13 +4,15 @@ import { useEffect, useRef } from 'react';
 
 interface AdsterraBannerProps {
   bannerKey?: string;
+  scriptHost?: string;
   width?: number;
   height?: number;
   className?: string;
 }
 
 export default function AdsterraBanner({
-  bannerKey = 'd092035ae89a38067d47dfdef5cf6b61',
+  bannerKey = '282e852f5808b9dd01d12c1ed30bf5d2',
+  scriptHost = 'www.highperformanceformat.com',
   width = 728,
   height = 90,
   className = '',
@@ -20,7 +22,7 @@ export default function AdsterraBanner({
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Clear previous iframe if re-rendered
+    // Clear previous elements if re-rendered
     containerRef.current.innerHTML = '';
 
     const iframe = document.createElement('iframe');
@@ -55,13 +57,13 @@ export default function AdsterraBanner({
                 'params' : {}
               };
             </script>
-            <script type="text/javascript" src="https://yearlybeak.com/${bannerKey}/invoke.js"></script>
+            <script type="text/javascript" src="https://${scriptHost}/${bannerKey}/invoke.js"></script>
           </body>
         </html>
       `);
       iframeDoc.close();
     }
-  }, [bannerKey, width, height]);
+  }, [bannerKey, scriptHost, width, height]);
 
   return (
     <div className={`w-full flex justify-center items-center my-3 overflow-hidden max-w-full ${className}`}>

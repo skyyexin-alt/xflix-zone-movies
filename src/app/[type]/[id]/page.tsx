@@ -8,6 +8,7 @@ import MovieCard from '@/components/ui/MovieCard';
 import CastCarousel from '@/components/ui/CastCarousel';
 import GlobalBackButton from '@/components/ui/GlobalBackButton';
 import AdskeeperWidget from '@/components/ui/AdskeeperWidget';
+import AdsterraBanner from '@/components/ui/AdsterraBanner';
 import { Play, Star, Calendar, Clock, Film, Shield, Tag } from 'lucide-react';
 
 export async function generateMetadata({
@@ -91,6 +92,9 @@ export default async function DetailPage({
       <Container className="space-y-8">
         <GlobalBackButton />
 
+        {/* Adsterra 728x90 Banner Above Video Player */}
+        <AdsterraBanner />
+
         {/* FlickZone Hero Backdrop Video Player Block */}
         <div className="relative w-full h-[280px] sm:h-[400px] md:h-[480px] rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-[#14142f] group">
           {backdropPath ? (
@@ -119,7 +123,8 @@ export default async function DetailPage({
           </Link>
         </div>
 
-        {/* FlickZone Exact Movie Details Block */}
+        {/* Adsterra 728x90 Banner Above Movie Details & Poster Card */}
+        <AdsterraBanner />
 
         {/* FlickZone Exact Movie Details Block */}
         <div className="flex flex-col md:flex-row gap-6 lg:gap-8 items-start bg-[#14142f] border border-white/10 rounded-2xl p-5 sm:p-7 shadow-xl">
