@@ -33,6 +33,7 @@ jobs:
             echo "NEXT_PUBLIC_TMDB_API_KEY=5d067b9d81cc3970f1365e1e9862ce6b" > .env.local
             echo "NEXT_PUBLIC_SITE_URL=https://xflix.ink" >> .env.local
 
+            rm -rf .next
             npm install
             npm run build
 
