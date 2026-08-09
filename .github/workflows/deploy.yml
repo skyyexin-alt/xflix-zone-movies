@@ -6,70 +6,43 @@ on:
       - main
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 🚀 Checkout Codebase
-        uses: actions/checkout@v4
-
-      - name: 🟢 Setup Node.js 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-
-      - name: 📦 Install Dependencies
-        run: npm ci
-
-      - name: 🛠️ Build Production Bundle
-        run: npm run build
-
-      - name: 🚀 Deploy to Hetzner VPS
+      - name: 🚀 Deploy to Hetzner VPS via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.HETZNER_HOST || secrets.SERVER_IP }}
+          host: ${{ secrets.HETZNER_HOST }}
           username: ${{ secrets.HETZNER_USER || 'root' }}
-          password: ${{ secrets.HETZNER_PASSWORD || secrets.SERVER_PASSWORD }}
           key: ${{ secrets.HETZNER_SSH_KEY }}
           port: 22
           script: |
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            export PATH=$PATH:/usr/local/bin:/usr/bin:/root/.nvm/versions/node/$(ls /root/.nvm/versions/node 2>/dev/null | tail -n 1)/bin
-            export PATH=$PATH:~/.nvm/versions/node/$(ls ~/.nvm/versions/node 2>/dev/null | tail -n 1)/bin
-
             echo "=================================================="
-            echo "🚀 STARTING HETZNER AUTO-DEPLOYMENT FOR NEXTZONE"
+            echo "🚀 AUTO-DEPLOYING NEXTZONE MOVIES ON HETZNER"
             echo "=================================================="
-
+            
             TARGET_DIR="/var/www/nextzone-movies"
-            echo "--> Deploying to target directory: $TARGET_DIR"
             mkdir -p "$TARGET_DIR"
             cd "$TARGET_DIR"
 
             git config --global --add safe.directory "$TARGET_DIR" || true
-            git checkout -f main || true
             git fetch --all
-            git reset --hard origin/main || git pull origin main --force
+            git reset --hard origin/main
 
-            echo "--> Creating .env.local..."
             cat << 'ENVEOF' > .env.local
 NEXT_PUBLIC_TMDB_API_KEY=5d067b9d81cc3970f1365e1e9862ce6b
 NEXT_PUBLIC_SITE_URL=https://xflix.ink
 ENVEOF
 
-            echo "--> Installing dependencies & building app..."
             npm install
             npm run build
 
-            echo "--> Restarting PM2 process..."
             pm2 delete nextzone-movies || true
             PORT=3000 pm2 start npm --name "nextzone-movies" -- start -- -p 3000
             pm2 save --force || true
-
-            echo "--> Reloading Nginx..."
             systemctl reload nginx || systemctl restart nginx || true
+
             echo "=================================================="
-            echo "🎉 DEPLOYMENT COMPLETE!"
+            echo "🎉 DEPLOYMENT SUCCESSFUL!"
             echo "=================================================="
