@@ -75,12 +75,16 @@ export default function IntegratedPlayer({ title, backdrop, trailerKey, tmdbId, 
   useEffect(() => {
     async function fetchStream() {
       setIsStreamLoading(true);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4000); // Fast 4-second fallback
+
       try {
         const queryParams = type === 'tv' 
           ? `?id=${tmdbId}&type=tv&s=${activeSeason}&e=${activeEpisode}`
           : `?id=${tmdbId}&type=movie`;
           
-        const res = await fetch(`/api/stream${queryParams}`);
+        const res = await fetch(`/api/stream${queryParams}`, { signal: controller.signal });
+        clearTimeout(timeoutId);
         const data = await res.json();
         
         if (data.streamUrl) {
@@ -90,7 +94,6 @@ export default function IntegratedPlayer({ title, backdrop, trailerKey, tmdbId, 
           setStreamData(null); // No stream found by scraper, fallback to iframe
         }
       } catch (err) {
-        console.error("Failed to fetch stream data:", err);
         setStreamData(null);
       } finally {
         setIsStreamLoading(false);

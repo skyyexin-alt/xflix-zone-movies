@@ -42,14 +42,7 @@ jobs:
             echo "🚀 STARTING HETZNER AUTO-DEPLOYMENT FOR NEXTZONE"
             echo "=================================================="
 
-            TARGET_DIR="/var/www/xflix-zone-movies"
-            if [ ! -d "$TARGET_DIR" ]; then
-              FOUND_DIR=$(find /var/www /root /home /opt -name "xflix-zone-movies" -o -name "xflix-movies" -o -name "nextzone" -o -name "xflix" 2>/dev/null | head -n 1)
-              if [ -n "$FOUND_DIR" ]; then
-                TARGET_DIR="$FOUND_DIR"
-              fi
-            fi
-
+            TARGET_DIR="/var/www/nextzone-movies"
             echo "--> Deploying to target directory: $TARGET_DIR"
             mkdir -p "$TARGET_DIR"
             cd "$TARGET_DIR"
@@ -59,27 +52,23 @@ jobs:
             git fetch --all
             git reset --hard origin/main || git pull origin main --force
 
+            echo "--> Creating .env.local..."
+            cat << 'ENVEOF' > .env.local
+NEXT_PUBLIC_TMDB_API_KEY=5d067b9d81cc3970f1365e1e9862ce6b
+NEXT_PUBLIC_SITE_URL=https://xflix.ink
+ENVEOF
+
             echo "--> Installing dependencies & building app..."
-            npm install --legacy-peer-deps || npm install
-            rm -rf .next
+            npm install
             npm run build
 
-            # Detect proxy port from Nginx configuration for movies.xflix.ink
-            DETECTED_PORT=$(grep -rh "proxy_pass" /etc/nginx/ 2>/dev/null | grep -oE "127\.0\.0\.1:[0-9]+|localhost:[0-9]+" | head -n 1 | cut -d':' -f2)
-            PORT_TO_USE="${DETECTED_PORT:-3001}"
-            echo "--> Detected Nginx target port: $PORT_TO_USE"
-
-            echo "--> Restarting PM2 process on port $PORT_TO_USE..."
-            pm2 delete xflix-zone-movies || true
-            pm2 delete xflix-movies || true
-            pm2 delete nextzone || true
-            pm2 delete all || true
-
-            PORT=$PORT_TO_USE pm2 start node_modules/next/dist/bin/next --name "xflix-zone-movies" -- start -p $PORT_TO_USE || PORT=$PORT_TO_USE pm2 start npm --name "xflix-zone-movies" -- start -- -p $PORT_TO_USE
+            echo "--> Restarting PM2 process..."
+            pm2 delete nextzone-movies || true
+            PORT=3000 pm2 start npm --name "nextzone-movies" -- start -- -p 3000
             pm2 save --force || true
 
-            echo "--> Reloading Nginx web server..."
+            echo "--> Reloading Nginx..."
             systemctl reload nginx || systemctl restart nginx || true
             echo "=================================================="
-            echo "🎉 DEPLOYMENT COMPLETE! https://movies.xflix.ink is live on port $PORT_TO_USE."
+            echo "🎉 DEPLOYMENT COMPLETE!"
             echo "=================================================="
