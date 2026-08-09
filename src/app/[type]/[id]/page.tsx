@@ -7,6 +7,7 @@ import Container from '@/components/ui/Container';
 import MovieCard from '@/components/ui/MovieCard';
 import CastCarousel from '@/components/ui/CastCarousel';
 import GlobalBackButton from '@/components/ui/GlobalBackButton';
+import AdskeeperWidget from '@/components/ui/AdskeeperWidget';
 import { Play, Star, Calendar, Clock, Film, Shield, Tag } from 'lucide-react';
 
 export async function generateMetadata({
@@ -225,6 +226,9 @@ export default async function DetailPage({
           </div>
         </div>
 
+        {/* Adskeeper Banner Above Cast Section */}
+        <AdskeeperWidget widgetId="2066162" />
+
         {/* Cast Section */}
         {cast.length > 0 && (
           <div className="space-y-4 pt-4">
@@ -242,6 +246,9 @@ export default async function DetailPage({
                 <MovieCard key={item.id} item={{...item, media_type: type}} className="w-full" />
               ))}
             </div>
+
+            {/* Adskeeper Widget Under You May Also Like Posters */}
+            <AdskeeperWidget widgetId="2066162" />
           </div>
         )}
 
