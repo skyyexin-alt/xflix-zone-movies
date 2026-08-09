@@ -32,22 +32,28 @@ export interface VideoItem {
 }
 
 export async function fetchAPI(endpoint: string, params: Record<string, string> = {}) {
-  const url = new URL(`${BASE_URL}${endpoint}`);
-  url.searchParams.append('api_key', TMDB_API_KEY || '');
-  
-  Object.keys(params).forEach(key => {
-    url.searchParams.append(key, params[key]);
-  });
+  try {
+    const url = new URL(`${BASE_URL}${endpoint}`);
+    url.searchParams.append('api_key', TMDB_API_KEY || '');
+    
+    Object.keys(params).forEach(key => {
+      url.searchParams.append(key, params[key]);
+    });
 
-  const response = await fetch(url.toString(), {
-    next: { revalidate: 3600 } // Cache for 1 hour by default
-  });
-  
-  if (!response.ok) {
-    throw new Error('Failed to fetch TMDB data');
+    const response = await fetch(url.toString(), {
+      next: { revalidate: 3600 } // Cache for 1 hour by default
+    });
+    
+    if (!response.ok) {
+      console.error(`[TMDB API Error] ${endpoint} returned status ${response.status}`);
+      return { results: [], page: 1, total_pages: 0, total_results: 0 };
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error(`[TMDB Network Exception] ${endpoint}:`, error);
+    return { results: [], page: 1, total_pages: 0, total_results: 0 };
   }
-
-  return response.json();
 }
 
 export async function getTrending(type: 'all' | 'movie' | 'tv' = 'all') {
