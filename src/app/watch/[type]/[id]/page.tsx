@@ -7,7 +7,6 @@ import IntegratedPlayer from '@/components/ui/IntegratedPlayer';
 import CastCarousel from '@/components/ui/CastCarousel';
 import MovieCard from '@/components/ui/MovieCard';
 import GlobalBackButton from '@/components/ui/GlobalBackButton';
-import AdsterraBanner from '@/components/ui/AdsterraBanner';
 import { Star, ArrowLeft, Heart } from 'lucide-react';
 
 export async function generateMetadata({
@@ -78,9 +77,6 @@ export default async function WatchPage({
             Streaming in HD 1080p
           </span>
         </div>
-
-        {/* Adsterra 728x90 Banner Above Integrated Player */}
-        <AdsterraBanner />
 
         {/* Integrated Video Player */}
         <div className="space-y-4">
