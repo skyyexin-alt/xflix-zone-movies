@@ -8,8 +8,6 @@ import { Providers } from "./Providers";
 import InstallAppButton from "@/components/ui/InstallAppButton";
 import StickySocialSidebar from "@/components/ui/StickySocialSidebar";
 import Script from "next/script";
-import AdskeeperNotification from "@/components/ui/AdskeeperNotification";
-import AdskeeperWidget from "@/components/ui/AdskeeperWidget";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
@@ -91,8 +89,6 @@ export default function RootLayout({
         <meta name="twitter:title" content="XFlix - Movies Review, Ratings, K-Dramas & Recommendations" />
         <meta name="twitter:description" content="Discover honest movie reviews, user ratings, top Asian dramas, synopsis breakdowns, cast filmographies, and recommendations on XFlix Movies Review." />
         <meta name="twitter:image" content="https://movies.xflix.ink/opengraph-image" />
-        <script src="https://jsc.adskeeper.com/site/1106781.js" async />
-        <script src="https://jsc.adskeeper.com/site/2066162.js" async />
       </head>
       <body className={`${inter.className} bg-[#0f0f23] text-white antialiased`} suppressHydrationWarning>
         <Providers>
@@ -102,10 +98,6 @@ export default function RootLayout({
           </main>
           <InstallAppButton />
           <StickySocialSidebar />
-          <AdskeeperNotification />
-          <div className="max-w-7xl mx-auto px-4 w-full my-6">
-            <AdskeeperWidget widgetId="2066162" />
-          </div>
           <Footer />
           <MobileBottomNav />
         </Providers>
