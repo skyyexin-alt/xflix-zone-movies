@@ -7,6 +7,7 @@ import Container from '@/components/ui/Container';
 import MovieCard from '@/components/ui/MovieCard';
 import CastCarousel from '@/components/ui/CastCarousel';
 import GlobalBackButton from '@/components/ui/GlobalBackButton';
+import AdsterraBanner from '@/components/ui/AdsterraBanner';
 import { Play, Star, Calendar, Clock, Film, Shield, Tag } from 'lucide-react';
 
 export async function generateMetadata({
@@ -89,6 +90,9 @@ export default async function DetailPage({
     <div className="min-h-screen bg-[#0e0b1d] text-white pt-20 pb-24">
       <Container className="space-y-8">
         <GlobalBackButton />
+
+        {/* Adsterra Banner Above Video Player */}
+        <AdsterraBanner />
 
         {/* FlickZone Hero Backdrop Video Player Block */}
         <div className="relative w-full h-[280px] sm:h-[400px] md:h-[480px] rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-[#14142f] group">

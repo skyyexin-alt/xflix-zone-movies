@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Container from '@/components/ui/Container';
 import FlickZoneHero from '@/components/ui/FlickZoneHero';
 import TelegramBanner from '@/components/ui/TelegramBanner';
+import AdsterraBanner from '@/components/ui/AdsterraBanner';
 import MovieCard from '@/components/ui/MovieCard';
 import ContinueWatchingSection from '@/components/ui/ContinueWatchingSection';
 import { 
@@ -50,6 +51,8 @@ export default async function Home() {
       <FlickZoneHero item={heroItem} />
 
       <Container>
+        {/* Adsterra Banner Under Hero */}
+        <AdsterraBanner />
         {/* 2. Telegram / Community Join Banner */}
         <TelegramBanner />
 
