@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Script from 'next/script';
 import Container from '@/components/ui/Container';
+import AdsKeeperWidget from '@/components/ui/AdsKeeperWidget';
 import { Film } from 'lucide-react';
 
 export default function Footer() {
@@ -84,6 +85,9 @@ export default function Footer() {
           <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
           <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
         </div>
+
+        {/* AdsKeeper Widget At Bottom */}
+        <AdsKeeperWidget />
 
         {/* Copyright & Visitor Counter */}
         <div className="text-center pt-2 text-xs text-zinc-500 space-y-2">

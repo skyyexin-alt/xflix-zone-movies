@@ -7,7 +7,7 @@ import IntegratedPlayer from '@/components/ui/IntegratedPlayer';
 import CastCarousel from '@/components/ui/CastCarousel';
 import MovieCard from '@/components/ui/MovieCard';
 import GlobalBackButton from '@/components/ui/GlobalBackButton';
-import AdsterraBanner from '@/components/ui/AdsterraBanner';
+import AdsKeeperWidget from '@/components/ui/AdsKeeperWidget';
 import { Star, ArrowLeft, Heart } from 'lucide-react';
 
 export async function generateMetadata({
@@ -79,8 +79,8 @@ export default async function WatchPage({
           </span>
         </div>
 
-        {/* Adsterra Banner Above Integrated Player */}
-        <AdsterraBanner />
+        {/* AdsKeeper Widget Above Video Player */}
+        <AdsKeeperWidget />
 
         {/* Integrated Video Player */}
         <div className="space-y-4">
@@ -153,6 +153,9 @@ export default async function WatchPage({
             </div>
           </div>
         )}
+
+        {/* AdsKeeper Widget At Bottom of Page */}
+        <AdsKeeperWidget />
 
       </Container>
     </div>
