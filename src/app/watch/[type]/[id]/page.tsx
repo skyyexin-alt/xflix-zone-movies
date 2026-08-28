@@ -8,6 +8,7 @@ import CastCarousel from '@/components/ui/CastCarousel';
 import MovieCard from '@/components/ui/MovieCard';
 import GlobalBackButton from '@/components/ui/GlobalBackButton';
 import AdsKeeperWidget from '@/components/ui/AdsKeeperWidget';
+import AdsterraBanner from '@/components/ui/AdsterraBanner';
 import { Star, ArrowLeft, Heart } from 'lucide-react';
 
 export const revalidate = 3600;
@@ -81,8 +82,8 @@ export default async function WatchPage({
           </span>
         </div>
 
-        {/* AdsKeeper Widget Above Video Player */}
-        <AdsKeeperWidget />
+        {/* Adsterra 728x90 Banner Above Video Player */}
+        <AdsterraBanner />
 
         {/* Integrated Video Player */}
         <div className="space-y-4">
@@ -156,8 +157,8 @@ export default async function WatchPage({
           </div>
         )}
 
-        {/* AdsKeeper Widget At Bottom of Page */}
-        <AdsKeeperWidget />
+        {/* Adsterra 728x90 Banner At Bottom of Page */}
+        <AdsterraBanner />
 
       </Container>
     </div>

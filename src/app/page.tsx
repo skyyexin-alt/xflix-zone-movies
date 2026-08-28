@@ -4,6 +4,7 @@ import Container from '@/components/ui/Container';
 import FlickZoneHero from '@/components/ui/FlickZoneHero';
 import TelegramBanner from '@/components/ui/TelegramBanner';
 import AdsKeeperWidget from '@/components/ui/AdsKeeperWidget';
+import AdsterraBanner from '@/components/ui/AdsterraBanner';
 import MovieCard from '@/components/ui/MovieCard';
 import ContinueWatchingSection from '@/components/ui/ContinueWatchingSection';
 import { 
@@ -51,8 +52,8 @@ export default async function Home() {
       <FlickZoneHero item={heroItem} />
 
       <Container>
-        {/* AdsKeeper Widget Above Content */}
-        <AdsKeeperWidget />
+        {/* Adsterra 728x90 Banner Above Content */}
+        <AdsterraBanner />
 
         {/* 2. Telegram / Community Join Banner */}
         <TelegramBanner />
@@ -192,8 +193,8 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* AdsKeeper Widget At Bottom of Page */}
-        <AdsKeeperWidget />
+        {/* Adsterra 728x90 Banner At Bottom of Page */}
+        <AdsterraBanner />
 
       </Container>
     </div>
