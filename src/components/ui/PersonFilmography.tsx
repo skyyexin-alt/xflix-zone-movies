@@ -336,7 +336,7 @@ export default function PersonFilmography({ credits }: PersonFilmographyProps) {
 
                 {/* Big HD Poster Image */}
                 <Link 
-                  href={`/${isMovie ? 'movie' : 'tv'}/${item.id}`} 
+                  href={`/watch/${isMovie ? 'movie' : 'tv'}/${item.id}`} 
                   className="relative w-full sm:w-64 md:w-72 h-80 md:h-[390px] rounded-2xl overflow-hidden flex-shrink-0 border border-white/10 group-hover:scale-102 transition-transform shadow-2xl"
                 >
                   <Image
@@ -352,7 +352,7 @@ export default function PersonFilmography({ credits }: PersonFilmographyProps) {
                   <div>
                     <div className="flex items-center gap-2 flex-wrap mb-1">
                       <Link 
-                        href={`/${isMovie ? 'movie' : 'tv'}/${item.id}`}
+                        href={`/watch/${isMovie ? 'movie' : 'tv'}/${item.id}`}
                         className="text-xl font-black text-white hover:text-violet-300 transition-colors line-clamp-1"
                       >
                         {title}

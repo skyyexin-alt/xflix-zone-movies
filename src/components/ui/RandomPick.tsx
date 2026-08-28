@@ -97,11 +97,11 @@ export default function RandomPick() {
                       <Play className="w-4 h-4 fill-black" /> Play
                     </Link>
                     <Link 
-                      href={`/movie/${item.id}`}
+                      href={`/watch/movie/${item.id}`}
                       onClick={handleClose}
                       className="flex-1 flex items-center justify-center gap-2 bg-white/10 text-white py-2.5 rounded-lg font-semibold hover:bg-white/20 transition-colors"
                     >
-                      <Info className="w-4 h-4" /> Details
+                      <Info className="w-4 h-4" /> Watch Now
                     </Link>
                   </div>
                   

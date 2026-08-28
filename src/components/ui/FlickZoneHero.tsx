@@ -79,11 +79,11 @@ export default function FlickZoneHero({ item }: FlickZoneHeroProps) {
           </Link>
 
           <Link
-            href={`/${item.media_type || 'movie'}/${item.id}`}
+            href={`/watch/${item.media_type || 'movie'}/${item.id}`}
             className="flex items-center gap-2.5 bg-white/10 hover:bg-white/20 text-white border border-white/15 text-base font-medium px-6 py-3 rounded-xl transition-all backdrop-blur-md active:scale-95"
           >
             <Info className="w-5 h-5" />
-            <span>More Info</span>
+            <span>Watch Full HD</span>
           </Link>
         </div>
       </div>

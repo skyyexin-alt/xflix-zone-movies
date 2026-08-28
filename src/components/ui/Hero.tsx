@@ -12,7 +12,7 @@ export default function Hero({ item }: HeroProps) {
 
   const isMovie = item.media_type === 'movie' || !item.first_air_date;
   const title = item.title || item.name;
-  const url = `/${isMovie ? 'movie' : 'tv'}/${item.id}`;
+  const url = `/watch/${isMovie ? 'movie' : 'tv'}/${item.id}`;
   const year = (item.release_date || item.first_air_date || '').substring(0, 4);
   const backdrop = item.backdrop_path 
     ? `https://image.tmdb.org/t/p/original${item.backdrop_path}` 

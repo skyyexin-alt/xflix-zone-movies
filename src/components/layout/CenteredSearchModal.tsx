@@ -114,7 +114,7 @@ export default function CenteredSearchModal({ isOpen, onClose }: CenteredSearchM
                 return (
                   <Link
                     key={`${mediaType}-${item.id}`}
-                    href={mediaType === 'person' ? `/explore?cat=Top+Actors` : `/${mediaType}/${item.id}`}
+                    href={mediaType === 'person' ? `/explore?cat=Top+Actors` : `/watch/${mediaType}/${item.id}`}
                     onClick={onClose}
                     className="flex items-center justify-between gap-4 p-3 rounded-2xl bg-white/4 hover:bg-violet-600/20 border border-white/6 hover:border-violet-500/40 transition-all group"
                   >

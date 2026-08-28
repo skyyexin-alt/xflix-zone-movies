@@ -53,9 +53,9 @@ export default function MDLHeroGrid({ items }: MDLHeroGridProps) {
             )}
           </div>
 
-          <Link href={`/${mainItem.title ? 'movie' : 'tv'}/${mainItem.id}`} className="block">
+          <Link href={`/watch/${mainItem.title ? 'movie' : 'tv'}/${mainItem.id}`} className="block">
             <h2 className="text-xs sm:text-2xl lg:text-3xl font-black text-white group-hover:text-violet-300 transition-colors leading-tight sm:leading-snug line-clamp-2">
-              Official Review & Details: {mainTitle}
+              Watch Now: {mainTitle}
             </h2>
           </Link>
 
@@ -101,9 +101,9 @@ export default function MDLHeroGrid({ items }: MDLHeroGridProps) {
                   </span>
                 </div>
 
-                <Link href={`/${item.title ? 'movie' : 'tv'}/${item.id}`} className="block">
+                <Link href={`/watch/${item.title ? 'movie' : 'tv'}/${item.id}`} className="block">
                   <h3 className="text-[11px] sm:text-base font-black text-white group-hover:text-violet-300 transition-colors line-clamp-2 leading-tight">
-                    {itemTitle} {itemYear ? `(${itemYear})` : ''} - Plot & Cast Overview
+                    {itemTitle} {itemYear ? `(${itemYear})` : ''} - Stream in HD
                   </h3>
                 </Link>
               </div>

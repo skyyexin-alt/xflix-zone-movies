@@ -92,7 +92,7 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
               {results.map(item => {
                 const title = item.title || item.name;
                 const isMovie = item.media_type === 'movie';
-                const href = `/${isMovie ? 'movie' : 'tv'}/${item.id}`;
+                const href = `/watch/${isMovie ? 'movie' : 'tv'}/${item.id}`;
                 const poster = item.poster_path 
                   ? `https://image.tmdb.org/t/p/w342${item.poster_path}`
                   : 'https://via.placeholder.com/342x513?text=No+Poster';

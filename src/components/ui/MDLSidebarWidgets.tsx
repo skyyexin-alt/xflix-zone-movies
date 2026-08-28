@@ -45,7 +45,7 @@ export default function MDLSidebarWidgets({ topRated }: MDLSidebarWidgetsProps) 
 
                 {/* Poster (100% Bigger!) */}
                 <Link 
-                  href={`/${item.title ? 'movie' : 'tv'}/${item.id}`} 
+                  href={`/watch/${item.title ? 'movie' : 'tv'}/${item.id}`} 
                   className="relative w-18 sm:w-20 h-26 sm:h-28 rounded-2xl overflow-hidden flex-shrink-0 border border-white/10 shadow-xl group-hover:scale-102 transition-transform"
                 >
                   <Image src={poster} alt={title} fill className="object-cover group-hover:scale-105 transition-transform" />
@@ -53,7 +53,7 @@ export default function MDLSidebarWidgets({ topRated }: MDLSidebarWidgetsProps) 
 
                 {/* Info (30% Bigger Text) */}
                 <div className="flex-1 min-w-0 space-y-1">
-                  <Link href={`/${item.title ? 'movie' : 'tv'}/${item.id}`} className="block font-black text-white text-sm sm:text-base truncate group-hover:text-violet-300 transition-colors leading-snug">
+                  <Link href={`/watch/${item.title ? 'movie' : 'tv'}/${item.id}`} className="block font-black text-white text-sm sm:text-base truncate group-hover:text-violet-300 transition-colors leading-snug">
                     {title}
                   </Link>
 

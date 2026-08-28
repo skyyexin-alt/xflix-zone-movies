@@ -69,7 +69,7 @@ export default function CommunityList({ items, genreMap }: CommunityListProps) {
             >
               {/* HD Movie Poster Frame (Framed poster on mobile & desktop!) */}
               <Link
-                href={`/${isMovie ? 'movie' : 'tv'}/${item.id}`}
+                href={`/watch/${isMovie ? 'movie' : 'tv'}/${item.id}`}
                 className="relative w-28 sm:w-52 md:w-60 h-36 sm:h-80 md:h-[350px] rounded-xl sm:rounded-2xl overflow-hidden flex-shrink-0 self-start border border-white/10 group-hover:scale-102 transition-transform shadow-2xl bg-violet-950"
               >
                 <Image
@@ -85,7 +85,7 @@ export default function CommunityList({ items, genreMap }: CommunityListProps) {
                 <div>
                   {/* Title + Watchlist Add Button */}
                   <div className="flex items-start justify-between gap-2 mb-1">
-                    <Link href={`/${isMovie ? 'movie' : 'tv'}/${item.id}`} className="block flex-1 min-w-0">
+                    <Link href={`/watch/${isMovie ? 'movie' : 'tv'}/${item.id}`} className="block flex-1 min-w-0">
                       <h3 className="text-sm sm:text-xl font-extrabold sm:font-black text-white group-hover:text-violet-300 transition-colors leading-tight sm:leading-snug line-clamp-2">
                         {title}
                       </h3>

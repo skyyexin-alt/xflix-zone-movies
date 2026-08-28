@@ -24,7 +24,7 @@ export default function MovieCard({ item, className = '', progress }: MovieCardP
 
   const isMovie = item.media_type === 'movie' || !item.first_air_date;
   const title = item.title || item.name || 'Untitled';
-  const url = `/${isMovie ? 'movie' : 'tv'}/${item.id}`;
+  const url = `/watch/${isMovie ? 'movie' : 'tv'}/${item.id}`;
   const year = (item.release_date || item.first_air_date || '').substring(0, 4);
   const rating = item.vote_average ? item.vote_average.toFixed(1) : null;
   const poster = item.poster_path 
