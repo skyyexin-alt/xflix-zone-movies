@@ -8,6 +8,7 @@ import { Providers } from "./Providers";
 import InstallAppButton from "@/components/ui/InstallAppButton";
 import StickySocialSidebar from "@/components/ui/StickySocialSidebar";
 import ExoClickInPagePush from "@/components/ui/ExoClickInPagePush";
+import ExoClickInterstitial from "@/components/ui/ExoClickInterstitial";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
@@ -99,6 +100,7 @@ export default function RootLayout({
           <InstallAppButton />
           <StickySocialSidebar />
           <ExoClickInPagePush zoneId="6014150" />
+          <ExoClickInterstitial zoneId="6014154" />
           <Footer />
           <MobileBottomNav />
         </Providers>
