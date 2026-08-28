@@ -6,7 +6,6 @@ import Container from '@/components/ui/Container';
 import IntegratedPlayer from '@/components/ui/IntegratedPlayer';
 import CastCarousel from '@/components/ui/CastCarousel';
 import MovieCard from '@/components/ui/MovieCard';
-import GlobalBackButton from '@/components/ui/GlobalBackButton';
 import AdsterraBanner from '@/components/ui/AdsterraBanner';
 import { Star, ArrowLeft, Heart } from 'lucide-react';
 
@@ -59,7 +58,6 @@ export default async function WatchPage({
   const cast = data.credits?.cast || [];
 
   const trailer = data.videos?.results?.find((v: any) => v.type === 'Trailer' && v.site === 'YouTube') || data.videos?.results?.[0];
-
   const recommendations = (data.recommendations?.results || data.similar?.results || []).slice(0, 12);
 
   return (
@@ -97,7 +95,7 @@ export default async function WatchPage({
           />
         </div>
 
-        {/* Title Info & Synopsis */}
+        {/* Title Info & Synopsis Box */}
         <div className="bg-[#14142f] border border-white/10 rounded-2xl p-6 space-y-4 shadow-xl">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div className="space-y-1">

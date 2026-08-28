@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-import { TriangleAlert, Star, Play, ChevronDown, CheckCircle2, ShieldCheck, Maximize, Minimize } from 'lucide-react';
+import { TriangleAlert, Star, Play, ChevronDown, CheckCircle2, Maximize } from 'lucide-react';
 import CustomVideoPlayer from './CustomVideoPlayer';
+import VastPreRollPlayer from './VastPreRollPlayer';
 
 interface IntegratedPlayerProps {
   title: string;
   backdrop: string;
+  poster?: string;
   trailerKey?: string;
   tmdbId: string;
   type: 'movie' | 'tv';
@@ -21,21 +23,25 @@ function applyDefaultSubtitle(subs: any[], originalLanguage?: string): any[] {
   const isNonEnglish = originalLanguage && originalLanguage !== 'en';
   if (!isNonEnglish) return subs;
 
-  // Check if any subtitle already has default=true — if so, respect it
   const hasExplicitDefault = subs.some((s) => s.default);
   if (hasExplicitDefault) return subs;
 
-  // Find an English subtitle (en, en-US, en-GB …)
-  const engIndex = subs.findIndex(
-    (s) => s.srcLang?.toLowerCase().startsWith('en')
-  );
-  if (engIndex === -1) return subs; // No English track available
+  const engIndex = subs.findIndex((s) => s.srcLang?.toLowerCase().startsWith('en'));
+  if (engIndex === -1) return subs;
 
   return subs.map((s, i) => ({ ...s, default: i === engIndex }));
 }
 
-export default function IntegratedPlayer({ title, backdrop, trailerKey, tmdbId, type, seasons = [], originalLanguage }: IntegratedPlayerProps) {
-  const [activeServer, setActiveServer] = useState('VidSrc');
+export default function IntegratedPlayer({ 
+  title, 
+  backdrop, 
+  trailerKey, 
+  tmdbId, 
+  type, 
+  seasons = [], 
+  originalLanguage 
+}: IntegratedPlayerProps) {
+  const [activeServer, setActiveServer] = useState('Server 2 (VidLink Pro)');
 
   // Find a valid default season (prefer Season 1 over Season 0/Specials)
   const defaultSeason = seasons.find((s: any) => s.season_number > 0) || seasons[0];
@@ -45,7 +51,25 @@ export default function IntegratedPlayer({ title, backdrop, trailerKey, tmdbId, 
   const [streamData, setStreamData] = useState<{ url: string, subs: any[] } | null>(null);
   const [isStreamLoading, setIsStreamLoading] = useState(false);
   const [iframeOverlayVisible, setIframeOverlayVisible] = useState(false);
+  const [vastAd, setVastAd] = useState<any | null>(null);
   const iframeContainerRef = useRef<HTMLDivElement>(null);
+
+  // Fetch ExoClick VAST in-stream video ad
+  useEffect(() => {
+    async function checkVastAd() {
+      try {
+        const res = await fetch('/api/vast');
+        const data = await res.json();
+        if (data.hasAd && data.mediaUrl) {
+          setVastAd(data);
+        }
+      } catch (err) {
+        // Silently skip ad on error
+      }
+    }
+
+    checkVastAd();
+  }, [tmdbId, activeSeason, activeEpisode]);
 
   // Fetch direct HLS stream URL asynchronously if available
   useEffect(() => {
@@ -75,68 +99,36 @@ export default function IntegratedPlayer({ title, backdrop, trailerKey, tmdbId, 
     setIframeOverlayVisible(false);
   }, [activeServer, activeSeason, activeEpisode]);
 
-
   const handleIframePlay = () => {
     setIframeOverlayVisible(false);
   };
 
+  const handleAdComplete = () => {
+    setVastAd(null);
+  };
+
   const servers = [
-    { name: 'VidSrc', id: 'vidsrc', isRecommended: true },
-    { name: 'VidSrc.fyi', id: 'vidsrcfyi' },
-    { name: 'VidRock', id: 'vidrock' },
-    { name: 'Vidnest', id: 'vidnest' },
-    { name: 'VidKing', id: 'vidking' },
-    { name: 'VidLink', id: 'vidlink' },
-    { name: 'VidFast', id: 'vidfast' },
-    { name: 'VidUp', id: 'vidup' },
-    { name: 'Videasy', id: 'videasy' },
-    { name: '111Movies', id: '111movies' },
-    { name: '2Embed', id: '2embed' },
-    { name: 'Peachify', id: 'peachify' },
-    { name: 'SuperFlix', id: 'superflix' },
-    { name: 'MultiEmbed', id: 'multiembed' },
+    { name: 'Server 1 (Full HD)', id: 'server-1' },
+    { name: 'Server 2 (VidLink Pro)', id: 'server-2', isRecommended: true },
+    { name: 'Server 3 (EmbedSU)', id: 'server-3' },
   ];
 
-  // To guarantee all buttons successfully load the video instead of showing broken homepages,
-  // we route them through the most stable embed API, ensuring 100% uptime for your users.
   const getEmbedUrl = () => {
-    const server = servers.find(s => s.name === activeServer);
-    const serverId = server ? server.id : 'vidsrc';
+    const server = servers.find(s => s.name === activeServer) || servers[0];
+    const serverId = server.id;
     
     if (type === 'tv') {
       switch (serverId) {
-        case 'vidsrc': return `https://vidsrc.mov/embed/tv/${tmdbId}/${activeSeason}/${activeEpisode}`;
-        case 'vidsrcfyi': return `https://vidsrc.me/embed/tv?tmdb=${tmdbId}&season=${activeSeason}&episode=${activeEpisode}`;
-        case 'vidrock': return `https://vidsrc.in/embed/tv?tmdb=${tmdbId}&season=${activeSeason}&episode=${activeEpisode}`;
-        case 'vidnest': return `https://vidsrc.pm/embed/tv?tmdb=${tmdbId}&season=${activeSeason}&episode=${activeEpisode}`;
-        case 'vidking': return `https://vidsrc.xyz/embed/tv?tmdb=${tmdbId}&season=${activeSeason}&episode=${activeEpisode}`;
-        case 'vidlink': return `https://vidlink.pro/tv/${tmdbId}/${activeSeason}/${activeEpisode}`;
-        case 'vidfast': return `https://vidsrc.to/embed/tv/${tmdbId}/${activeSeason}/${activeEpisode}`;
-        case 'vidup': return `https://vidsrc.pro/embed/tv/${tmdbId}/${activeSeason}/${activeEpisode}`;
-        case 'videasy': return `https://player.smashy.stream/tv/${tmdbId}?s=${activeSeason}&e=${activeEpisode}`;
-        case '111movies': return `https://autoembed.cc/embed/tv/${tmdbId}/${activeSeason}/${activeEpisode}`;
-        case '2embed': return `https://www.2embed.cc/embedtv/${tmdbId}&s=${activeSeason}&e=${activeEpisode}`;
-        case 'peachify': return `https://www.2embed.to/embed/tmdb/tv?id=${tmdbId}&s=${activeSeason}&e=${activeEpisode}`;
-        case 'superflix': return `https://mega.smashystream.com/tv/${tmdbId}?s=${activeSeason}&e=${activeEpisode}`;
-        case 'multiembed': return `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1&s=${activeSeason}&e=${activeEpisode}`;
+        case 'server-1': return `https://vidsrc.mov/embed/tv/${tmdbId}/${activeSeason}/${activeEpisode}`;
+        case 'server-2': return `https://vidlink.pro/tv/${tmdbId}/${activeSeason}/${activeEpisode}`;
+        case 'server-3': return `https://embed.su/embed/tv/${tmdbId}/${activeSeason}/${activeEpisode}`;
         default: return `https://vidsrc.mov/embed/tv/${tmdbId}/${activeSeason}/${activeEpisode}`;
       }
     } else {
       switch (serverId) {
-        case 'vidsrc': return `https://vidsrc.mov/embed/movie/${tmdbId}`;
-        case 'vidsrcfyi': return `https://vidsrc.me/embed/movie?tmdb=${tmdbId}`;
-        case 'vidrock': return `https://vidsrc.in/embed/movie?tmdb=${tmdbId}`;
-        case 'vidnest': return `https://vidsrc.pm/embed/movie?tmdb=${tmdbId}`;
-        case 'vidking': return `https://vidsrc.xyz/embed/movie?tmdb=${tmdbId}`;
-        case 'vidlink': return `https://vidlink.pro/movie/${tmdbId}`;
-        case 'vidfast': return `https://vidsrc.to/embed/movie/${tmdbId}`;
-        case 'vidup': return `https://vidsrc.pro/embed/movie/${tmdbId}`;
-        case 'videasy': return `https://player.smashy.stream/movie/${tmdbId}`;
-        case '111movies': return `https://autoembed.cc/embed/movie/${tmdbId}`;
-        case '2embed': return `https://www.2embed.cc/embed/${tmdbId}`;
-        case 'peachify': return `https://www.2embed.to/embed/tmdb/movie?id=${tmdbId}`;
-        case 'superflix': return `https://mega.smashystream.com/movie/${tmdbId}`;
-        case 'multiembed': return `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1`;
+        case 'server-1': return `https://vidsrc.mov/embed/movie/${tmdbId}`;
+        case 'server-2': return `https://vidlink.pro/movie/${tmdbId}`;
+        case 'server-3': return `https://embed.su/embed/movie/${tmdbId}`;
         default: return `https://vidsrc.mov/embed/movie/${tmdbId}`;
       }
     }
@@ -144,8 +136,6 @@ export default function IntegratedPlayer({ title, backdrop, trailerKey, tmdbId, 
 
   const currentSeasonData = seasons.find((s: any) => s.season_number === activeSeason);
   const episodeCount = currentSeasonData?.episode_count || 0;
-  
-  // Generate an array of episodes based on the episode count from getDetails
   const episodeList = Array.from({ length: episodeCount }, (_, i) => i + 1);
 
   const toggleFullscreen = () => {
@@ -168,54 +158,63 @@ export default function IntegratedPlayer({ title, backdrop, trailerKey, tmdbId, 
       <div className={`flex flex-col gap-6 ${type === 'tv' ? 'lg:w-3/4' : 'w-full'}`}>
         
         {/* Video Container */}
-        {isStreamLoading ? (
-          <div className="relative w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl border border-white/5 flex items-center justify-center">
-            <div className="w-10 h-10 border-4 border-violet-500 border-t-transparent rounded-full animate-spin"></div>
-          </div>
-        ) : streamData ? (
-          <CustomVideoPlayer 
-            src={streamData.url} 
-            poster={`https://image.tmdb.org/t/p/w1280${backdrop}`} 
-            subtitles={streamData.subs}
-          />
-        ) : (
-          <div ref={iframeContainerRef} className="relative w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl border border-white/5 group">
-            <iframe
-              key={`${activeServer}-${activeSeason}-${activeEpisode}`}
-              className="w-full h-full absolute inset-0 bg-black border-0"
-              src={getEmbedUrl()}
-              title={`${title} Player`}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
-              allowFullScreen={true}
-              referrerPolicy="origin"
-            ></iframe>
-            
-            {/* Native Fullscreen Hover Button */}
-            <button
-              onClick={toggleFullscreen}
-              className="absolute top-3 right-3 z-20 bg-black/70 hover:bg-violet-600 text-white p-2 rounded-lg backdrop-blur-md opacity-80 hover:opacity-100 transition-all border border-white/10 shadow-lg cursor-pointer"
-              title="Expand to Fullscreen"
-            >
-              <Maximize className="w-5 h-5" />
-            </button>
+        <div className="relative w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl border border-white/5 group">
+          
+          {/* ExoClick VAST Pre-Roll Video Ad Overlay */}
+          {vastAd && (
+            <VastPreRollPlayer adData={vastAd} onAdComplete={handleAdComplete} />
+          )}
 
-            {/* Play overlay */}
-            {iframeOverlayVisible && (
-              <div
-                className="absolute inset-0 z-10 flex items-center justify-center cursor-pointer group"
-                style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)' }}
-                onClick={handleIframePlay}
+          {isStreamLoading ? (
+            <div className="w-full h-full flex items-center justify-center">
+              <div className="w-10 h-10 border-4 border-violet-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : streamData ? (
+            <CustomVideoPlayer 
+              src={streamData.url} 
+              poster={`https://image.tmdb.org/t/p/w1280${backdrop}`} 
+              subtitles={streamData.subs}
+            />
+          ) : (
+            <div ref={iframeContainerRef} className="relative w-full h-full">
+              <iframe
+                key={`${activeServer}-${activeSeason}-${activeEpisode}`}
+                className="w-full h-full absolute inset-0 bg-black border-0"
+                src={getEmbedUrl()}
+                title={`${title} Player`}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+                allowFullScreen={true}
+                referrerPolicy="origin"
+              ></iframe>
+              
+              {/* Native Fullscreen Hover Button */}
+              <button
+                onClick={toggleFullscreen}
+                className="absolute top-3 right-3 z-20 bg-black/70 hover:bg-violet-600 text-white p-2 rounded-lg backdrop-blur-md opacity-80 hover:opacity-100 transition-all border border-white/10 shadow-lg cursor-pointer"
+                title="Expand to Fullscreen"
               >
-                <div className="w-20 h-20 rounded-full bg-violet-600/90 flex items-center justify-center shadow-[0_0_40px_rgba(124,58,237,0.6)] group-hover:scale-110 group-hover:bg-violet-500 transition-all duration-200">
-                  <Play className="w-9 h-9 text-white fill-white ml-1" />
-                </div>
-              </div>
-            )}
-          </div>
-        )}
+                <Maximize className="w-5 h-5" />
+              </button>
 
-        {/* Server Selection Section */}
+              {/* Play overlay */}
+              {iframeOverlayVisible && (
+                <div
+                  className="absolute inset-0 z-10 flex items-center justify-center cursor-pointer group"
+                  style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)' }}
+                  onClick={handleIframePlay}
+                >
+                  <div className="w-20 h-20 rounded-full bg-violet-600/90 flex items-center justify-center shadow-[0_0_40px_rgba(124,58,237,0.6)] group-hover:scale-110 group-hover:bg-violet-500 transition-all duration-200">
+                    <Play className="w-9 h-9 text-white fill-white ml-1" />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Server Selection Section (Exact Previous UI from screenshot) */}
         <div className="bg-[#222255]/40 border border-white/5 rounded-xl p-4 md:p-6 flex flex-col gap-4">
+          
           {/* Note Banner */}
           <div className="flex items-center gap-2.5 bg-amber-500/10 border border-amber-500/20 text-amber-300 rounded-lg p-3 text-xs md:text-sm font-medium">
             <TriangleAlert className="w-4 h-4 flex-shrink-0 text-amber-400" />
@@ -226,7 +225,9 @@ export default function IntegratedPlayer({ title, backdrop, trailerKey, tmdbId, 
 
           <div>
             <div className="flex items-center justify-between gap-2 mb-3">
-              <span className="text-zinc-400 text-sm">Select Server (<Star className="w-3.5 h-3.5 inline fill-amber-500 text-amber-500 -mt-0.5" /> = Recommended):</span>
+              <span className="text-zinc-400 text-sm">
+                Select Server (<Star className="w-3.5 h-3.5 inline fill-amber-500 text-amber-500 -mt-0.5" /> = Recommended):
+              </span>
               <button
                 onClick={toggleFullscreen}
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-violet-600/40 hover:bg-violet-600 border border-violet-500/50 text-white text-xs font-bold rounded-lg transition-all cursor-pointer shadow-md"
@@ -236,24 +237,28 @@ export default function IntegratedPlayer({ title, backdrop, trailerKey, tmdbId, 
               </button>
             </div>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2.5">
               {servers.map((server) => (
                 <button
                   key={server.id}
                   onClick={() => setActiveServer(server.name)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-md text-xs font-semibold transition-colors ${
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     activeServer === server.name 
-                      ? 'bg-violet-500 text-white shadow-lg' 
+                      ? 'bg-violet-600 text-white shadow-[0_0_20px_rgba(124,58,237,0.5)] border border-violet-400' 
                       : 'bg-[#2a2a4a] text-zinc-300 hover:bg-[#3a3a5a] hover:text-white border border-white/5'
                   }`}
                 >
-                  {server.name}
-                  {server.isRecommended && <Star className={`w-3.5 h-3.5 ${activeServer === server.name ? 'fill-amber-300 text-amber-300' : 'fill-amber-500 text-amber-500'}`} />}
+                  <span>{server.name}</span>
+                  {server.isRecommended && (
+                    <Star className={`w-3.5 h-3.5 ${activeServer === server.name ? 'fill-amber-300 text-amber-300' : 'fill-amber-500 text-amber-500'}`} />
+                  )}
                 </button>
               ))}
             </div>
           </div>
+
         </div>
+
       </div>
 
       {/* Right Column: TV Series Episodes Sidebar */}
@@ -266,7 +271,7 @@ export default function IntegratedPlayer({ title, backdrop, trailerKey, tmdbId, 
             <div className="relative">
               <button 
                 onClick={() => setIsSeasonDropdownOpen(!isSeasonDropdownOpen)}
-                className="w-full bg-[#2a2a4a] border border-white/10 hover:border-violet-500/50 text-white px-4 py-3 rounded-lg flex items-center justify-between transition-colors focus:outline-none"
+                className="w-full bg-[#2a2a4a] border border-white/10 hover:border-violet-500/50 text-white px-4 py-3 rounded-lg flex items-center justify-between transition-colors focus:outline-none cursor-pointer"
               >
                 <span className="font-semibold text-sm">Season {activeSeason} ({episodeCount} eps)</span>
                 <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform ${isSeasonDropdownOpen ? 'rotate-180' : ''}`} />
@@ -282,7 +287,7 @@ export default function IntegratedPlayer({ title, backdrop, trailerKey, tmdbId, 
                         setActiveEpisode(1);
                         setIsSeasonDropdownOpen(false);
                       }}
-                      className={`w-full text-left px-4 py-3 text-sm transition-colors ${
+                      className={`w-full text-left px-4 py-3 text-sm transition-colors cursor-pointer ${
                         activeSeason === season.season_number 
                           ? 'bg-violet-600 text-white font-bold' 
                           : 'text-zinc-300 hover:bg-white/5 hover:text-white font-medium'
@@ -303,14 +308,13 @@ export default function IntegratedPlayer({ title, backdrop, trailerKey, tmdbId, 
             {episodeList.length > 0 ? (
               episodeList.map((epNum) => {
                 const isActive = activeEpisode === epNum;
-                // Generate a deterministic fake rating for UI realism like the screenshot
                 const fakeRating = (7.0 + ((epNum * 3) % 20) / 10).toFixed(1);
                 
                 return (
                   <button
                     key={epNum}
                     onClick={() => setActiveEpisode(epNum)}
-                    className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all border ${
+                    className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all border cursor-pointer ${
                       isActive 
                         ? 'bg-violet-600 border-violet-500 text-white shadow-[0_4px_20px_rgba(124,58,237,0.3)]' 
                         : 'bg-[#2a2a4a]/50 border-transparent hover:bg-[#3a3a5a] text-zinc-300 hover:text-white'
@@ -321,8 +325,8 @@ export default function IntegratedPlayer({ title, backdrop, trailerKey, tmdbId, 
                     }`}>
                       {epNum}
                     </div>
-                    <div className="flex flex-col items-start flex-1 text-left">
-                      <span className={`text-sm font-bold ${isActive ? 'text-white' : 'text-zinc-200'}`}>
+                    <div className="flex flex-col items-start flex-1 text-left min-w-0">
+                      <span className={`text-sm font-bold truncate w-full ${isActive ? 'text-white' : 'text-zinc-200'}`}>
                         Episode {epNum}
                       </span>
                       <span className={`text-xs flex items-center gap-1 ${isActive ? 'text-violet-200' : 'text-zinc-500'}`}>
@@ -331,9 +335,9 @@ export default function IntegratedPlayer({ title, backdrop, trailerKey, tmdbId, 
                       </span>
                     </div>
                     {isActive ? (
-                      <CheckCircle2 className="w-5 h-5 text-white/80" />
+                      <CheckCircle2 className="w-5 h-5 text-white/80 flex-shrink-0" />
                     ) : (
-                      <Play className="w-4 h-4 text-zinc-500 group-hover:text-white opacity-0 transition-opacity" />
+                      <Play className="w-4 h-4 text-zinc-500 group-hover:text-white opacity-0 transition-opacity flex-shrink-0" />
                     )}
                   </button>
                 );
