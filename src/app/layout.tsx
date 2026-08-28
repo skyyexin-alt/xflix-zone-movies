@@ -92,6 +92,18 @@ export default function RootLayout({
         <meta name="twitter:image" content="https://movies.xflix.ink/opengraph-image" />
       </head>
       <body className={`${inter.className} bg-[#0f0f23] text-white antialiased`} suppressHydrationWarning>
+        {/* Adsterra Social Bar Ads */}
+        <Script
+          src="https://yearlybeak.com/77/db/f3/77dbf38e5071b9bc9a64c62784a136f4.js"
+          strategy="afterInteractive"
+        />
+
+        {/* Adsterra Popunder Ads */}
+        <Script
+          src="https://yearlybeak.com/6b/83/51/6b8351b07c0a5c280f7eb94ae34e2563.js"
+          strategy="afterInteractive"
+        />
+
         {/* Adskeeper In-Site Notification Ads Loader */}
         <Script
           src="https://jsc.adskeeper.com/site/1106781.js"
