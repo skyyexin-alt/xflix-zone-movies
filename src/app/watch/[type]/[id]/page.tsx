@@ -7,7 +7,6 @@ import IntegratedPlayer from '@/components/ui/IntegratedPlayer';
 import CastCarousel from '@/components/ui/CastCarousel';
 import MovieCard from '@/components/ui/MovieCard';
 import GlobalBackButton from '@/components/ui/GlobalBackButton';
-import AdsKeeperWidget from '@/components/ui/AdsKeeperWidget';
 import AdsterraBanner from '@/components/ui/AdsterraBanner';
 import { Star, ArrowLeft, Heart } from 'lucide-react';
 

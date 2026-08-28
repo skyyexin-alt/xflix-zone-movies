@@ -7,7 +7,6 @@ import Container from '@/components/ui/Container';
 import MovieCard from '@/components/ui/MovieCard';
 import CastCarousel from '@/components/ui/CastCarousel';
 import GlobalBackButton from '@/components/ui/GlobalBackButton';
-import AdsKeeperWidget from '@/components/ui/AdsKeeperWidget';
 import AdsterraBanner from '@/components/ui/AdsterraBanner';
 import { Play, Star, Calendar, Clock, Film, Shield, Tag } from 'lucide-react';
 
