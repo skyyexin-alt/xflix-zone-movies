@@ -10,6 +10,8 @@ import GlobalBackButton from '@/components/ui/GlobalBackButton';
 import AdsKeeperWidget from '@/components/ui/AdsKeeperWidget';
 import { Play, Star, Calendar, Clock, Film, Shield, Tag } from 'lucide-react';
 
+export const revalidate = 3600;
+
 export async function generateMetadata({
   params,
 }: {

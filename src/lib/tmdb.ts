@@ -1,3 +1,5 @@
+import { cache } from 'react';
+
 export const TMDB_API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY || '5d067b9d81cc3970f1365e1e9862ce6b';
 export const BASE_URL = 'https://api.themoviedb.org/3';
 export const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p';
@@ -31,83 +33,103 @@ export interface VideoItem {
   type: string;
 }
 
+// In-Memory Fast Cache for instant Localhost & SSR responses (< 1ms)
+const memoryCache = new Map<string, { data: any; expiresAt: number }>();
+const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
+
 export async function fetchAPI(endpoint: string, params: Record<string, string> = {}) {
   try {
     const url = new URL(`${BASE_URL}${endpoint}`);
     url.searchParams.append('api_key', TMDB_API_KEY || '');
     
-    Object.keys(params).forEach(key => {
+    Object.keys(params).sort().forEach(key => {
       url.searchParams.append(key, params[key]);
     });
 
-    const response = await fetch(url.toString(), {
-      next: { revalidate: 3600 } // Cache for 1 hour by default
+    const cacheKey = url.toString();
+    const cached = memoryCache.get(cacheKey);
+    const now = Date.now();
+
+    if (cached && cached.expiresAt > now) {
+      return cached.data;
+    }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s safety timeout
+
+    const response = await fetch(cacheKey, {
+      signal: controller.signal,
+      next: { revalidate: 3600 }
     });
     
+    clearTimeout(timeoutId);
+
     if (!response.ok) {
       console.error(`[TMDB API Error] ${endpoint} returned status ${response.status}`);
       return { results: [], page: 1, total_pages: 0, total_results: 0 };
     }
 
-    return await response.json();
+    const json = await response.json();
+    memoryCache.set(cacheKey, { data: json, expiresAt: now + CACHE_TTL_MS });
+    return json;
   } catch (error) {
     console.error(`[TMDB Network Exception] ${endpoint}:`, error);
     return { results: [], page: 1, total_pages: 0, total_results: 0 };
   }
 }
 
-export async function getTrending(type: 'all' | 'movie' | 'tv' = 'all') {
+export const getTrending = cache(async (type: 'all' | 'movie' | 'tv' = 'all') => {
   return fetchAPI(`/trending/${type}/week`);
-}
+});
 
-export async function getPopularMovies() {
+export const getPopularMovies = cache(async () => {
   return fetchAPI('/movie/popular');
-}
+});
 
-export async function getPopularTV() {
+export const getPopularTV = cache(async () => {
   return fetchAPI('/tv/popular');
-}
+});
 
-export async function getNowPlaying() {
+export const getNowPlaying = cache(async () => {
   return fetchAPI('/movie/now_playing');
-}
+});
 
-export async function getUpcoming() {
+export const getUpcoming = cache(async () => {
   return fetchAPI('/movie/upcoming');
-}
+});
 
-export async function getTopRatedMovies() {
+export const getTopRatedMovies = cache(async () => {
   return fetchAPI('/movie/top_rated');
-}
+});
 
-export async function getAiringToday() {
+export const getAiringToday = cache(async () => {
   return fetchAPI('/tv/airing_today');
-}
+});
 
-export async function getDetails(type: 'movie' | 'tv', id: string) {
+export const getDetails = cache(async (type: 'movie' | 'tv', id: string) => {
   return fetchAPI(`/${type}/${id}`, { append_to_response: 'credits,videos,similar,recommendations,images' });
-}
+});
 
-export async function searchMedia(query: string) {
+export const searchMedia = cache(async (query: string) => {
   return fetchAPI('/search/multi', { query });
-}
+});
 
-export async function getDiscoverMovies(params: Record<string, string> = {}) {
+export const getDiscoverMovies = cache(async (params: Record<string, string> = {}) => {
   return fetchAPI('/discover/movie', params);
-}
+});
 
-export async function getDiscoverTV(params: Record<string, string> = {}) {
+export const getDiscoverTV = cache(async (params: Record<string, string> = {}) => {
   return fetchAPI('/discover/tv', params);
-}
+});
 
-export async function getGenres(type: 'movie' | 'tv') {
+export const getGenres = cache(async (type: 'movie' | 'tv') => {
   return fetchAPI(`/genre/${type}/list`);
-}
+});
 
-export async function getPersonDetails(id: string) {
+export const getPersonDetails = cache(async (id: string) => {
   return fetchAPI(`/person/${id}`);
-}
+});
 
-export async function getPersonCredits(id: string) {
+export const getPersonCredits = cache(async (id: string) => {
   return fetchAPI(`/person/${id}/combined_credits`);
-}
+});

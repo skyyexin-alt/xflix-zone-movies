@@ -10,6 +10,8 @@ import GlobalBackButton from '@/components/ui/GlobalBackButton';
 import AdsKeeperWidget from '@/components/ui/AdsKeeperWidget';
 import { Star, ArrowLeft, Heart } from 'lucide-react';
 
+export const revalidate = 3600;
+
 export async function generateMetadata({
   params,
 }: {

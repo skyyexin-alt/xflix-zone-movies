@@ -1,7 +1,7 @@
 import { getDiscoverMovies, getDiscoverTV } from '@/lib/tmdb';
 import FlickZoneCatalog from '@/components/ui/FlickZoneCatalog';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
 export default async function ExplorePage({
   searchParams

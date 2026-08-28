@@ -2,7 +2,7 @@ import { getDiscoverMovies, getDiscoverTV, getPopularMovies, getTopRatedMovies, 
 import FlickZoneCatalog from '@/components/ui/FlickZoneCatalog';
 import { notFound } from 'next/navigation';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
 export default async function CatalogPage({ 
   params,

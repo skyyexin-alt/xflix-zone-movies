@@ -35,7 +35,7 @@ function applyDefaultSubtitle(subs: any[], originalLanguage?: string): any[] {
 }
 
 export default function IntegratedPlayer({ title, backdrop, trailerKey, tmdbId, type, seasons = [], originalLanguage }: IntegratedPlayerProps) {
-  const [activeServer, setActiveServer] = useState('VidLink');
+  const [activeServer, setActiveServer] = useState('VidSrc');
 
   // Find a valid default season (prefer Season 1 over Season 0/Specials)
   const defaultSeason = seasons.find((s: any) => s.season_number > 0) || seasons[0];
@@ -46,30 +46,6 @@ export default function IntegratedPlayer({ title, backdrop, trailerKey, tmdbId, 
   const [isStreamLoading, setIsStreamLoading] = useState(false);
   const [iframeOverlayVisible, setIframeOverlayVisible] = useState(false);
   const iframeContainerRef = useRef<HTMLDivElement>(null);
-
-  // Ultra Anti-Popup Shield
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    // Override window.open to block & immediately close any popup window handles
-    const originalOpen = window.open;
-    window.open = function (...args) {
-      console.warn('[Anti-Popup Shield] Intercepted and blocked ad popup attempt:', args[0]);
-      try {
-        const popupWin = originalOpen.apply(window, args);
-        if (popupWin && !popupWin.closed) {
-          popupWin.close(); // Immediately close the popup window if created!
-        }
-      } catch (e) {
-        // Silently block cross-origin open
-      }
-      return null;
-    };
-
-    return () => {
-      window.open = originalOpen;
-    };
-  }, []);
 
   // Fetch direct HLS stream URL asynchronously if available
   useEffect(() => {
@@ -105,63 +81,63 @@ export default function IntegratedPlayer({ title, backdrop, trailerKey, tmdbId, 
   };
 
   const servers = [
-    { name: 'VidLink', id: 'vidlink', isRecommended: true },
-    { name: 'vidsrc.mov', id: 'vidsrcmov' },
-    { name: 'VidFast', id: 'vidfast' },
-    { name: 'Videasy', id: 'videasy' },
+    { name: 'VidSrc', id: 'vidsrc', isRecommended: true },
+    { name: 'VidSrc.fyi', id: 'vidsrcfyi' },
     { name: 'VidRock', id: 'vidrock' },
     { name: 'Vidnest', id: 'vidnest' },
     { name: 'VidKing', id: 'vidking' },
+    { name: 'VidLink', id: 'vidlink' },
+    { name: 'VidFast', id: 'vidfast' },
+    { name: 'VidUp', id: 'vidup' },
+    { name: 'Videasy', id: 'videasy' },
     { name: '111Movies', id: '111movies' },
     { name: '2Embed', id: '2embed' },
-    { name: 'MultiEmbed', id: 'multiembed' },
-    { name: 'SuperFlix', id: 'superflix' },
     { name: 'Peachify', id: 'peachify' },
-    { name: 'VidUp', id: 'vidup' },
-    { name: 'VidSrc.fyi', id: 'vidsrcfyi' },
+    { name: 'SuperFlix', id: 'superflix' },
+    { name: 'MultiEmbed', id: 'multiembed' },
   ];
 
   // To guarantee all buttons successfully load the video instead of showing broken homepages,
   // we route them through the most stable embed API, ensuring 100% uptime for your users.
   const getEmbedUrl = () => {
     const server = servers.find(s => s.name === activeServer);
-    const serverId = server ? server.id : 'vidlink';
+    const serverId = server ? server.id : 'vidsrc';
     
     if (type === 'tv') {
       switch (serverId) {
-        case 'vidlink': return `https://vidlink.pro/tv/${tmdbId}/${activeSeason}/${activeEpisode}`;
-        case 'vidsrcmov': return `https://vidsrc.cc/v2/embed/tv/${tmdbId}/${activeSeason}/${activeEpisode}`;
+        case 'vidsrc': return `https://vidsrc.mov/embed/tv/${tmdbId}/${activeSeason}/${activeEpisode}`;
+        case 'vidsrcfyi': return `https://vidsrc.me/embed/tv?tmdb=${tmdbId}&season=${activeSeason}&episode=${activeEpisode}`;
         case 'vidrock': return `https://vidsrc.in/embed/tv?tmdb=${tmdbId}&season=${activeSeason}&episode=${activeEpisode}`;
         case 'vidnest': return `https://vidsrc.pm/embed/tv?tmdb=${tmdbId}&season=${activeSeason}&episode=${activeEpisode}`;
         case 'vidking': return `https://vidsrc.xyz/embed/tv?tmdb=${tmdbId}&season=${activeSeason}&episode=${activeEpisode}`;
-        case 'vidsrcfyi': return `https://vidsrc.me/embed/tv?tmdb=${tmdbId}&season=${activeSeason}&episode=${activeEpisode}`;
+        case 'vidlink': return `https://vidlink.pro/tv/${tmdbId}/${activeSeason}/${activeEpisode}`;
         case 'vidfast': return `https://vidsrc.to/embed/tv/${tmdbId}/${activeSeason}/${activeEpisode}`;
         case 'vidup': return `https://vidsrc.pro/embed/tv/${tmdbId}/${activeSeason}/${activeEpisode}`;
         case 'videasy': return `https://player.smashy.stream/tv/${tmdbId}?s=${activeSeason}&e=${activeEpisode}`;
         case '111movies': return `https://autoembed.cc/embed/tv/${tmdbId}/${activeSeason}/${activeEpisode}`;
         case '2embed': return `https://www.2embed.cc/embedtv/${tmdbId}&s=${activeSeason}&e=${activeEpisode}`;
-        case 'multiembed': return `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1&s=${activeSeason}&e=${activeEpisode}`;
-        case 'superflix': return `https://mega.smashystream.com/tv/${tmdbId}?s=${activeSeason}&e=${activeEpisode}`;
         case 'peachify': return `https://www.2embed.to/embed/tmdb/tv?id=${tmdbId}&s=${activeSeason}&e=${activeEpisode}`;
-        default: return `https://vidlink.pro/tv/${tmdbId}/${activeSeason}/${activeEpisode}`;
+        case 'superflix': return `https://mega.smashystream.com/tv/${tmdbId}?s=${activeSeason}&e=${activeEpisode}`;
+        case 'multiembed': return `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1&s=${activeSeason}&e=${activeEpisode}`;
+        default: return `https://vidsrc.mov/embed/tv/${tmdbId}/${activeSeason}/${activeEpisode}`;
       }
     } else {
       switch (serverId) {
-        case 'vidlink': return `https://vidlink.pro/movie/${tmdbId}`;
-        case 'vidsrcmov': return `https://vidsrc.cc/v2/embed/movie/${tmdbId}`;
+        case 'vidsrc': return `https://vidsrc.mov/embed/movie/${tmdbId}`;
+        case 'vidsrcfyi': return `https://vidsrc.me/embed/movie?tmdb=${tmdbId}`;
         case 'vidrock': return `https://vidsrc.in/embed/movie?tmdb=${tmdbId}`;
         case 'vidnest': return `https://vidsrc.pm/embed/movie?tmdb=${tmdbId}`;
         case 'vidking': return `https://vidsrc.xyz/embed/movie?tmdb=${tmdbId}`;
-        case 'vidsrcfyi': return `https://vidsrc.me/embed/movie?tmdb=${tmdbId}`;
+        case 'vidlink': return `https://vidlink.pro/movie/${tmdbId}`;
         case 'vidfast': return `https://vidsrc.to/embed/movie/${tmdbId}`;
         case 'vidup': return `https://vidsrc.pro/embed/movie/${tmdbId}`;
         case 'videasy': return `https://player.smashy.stream/movie/${tmdbId}`;
         case '111movies': return `https://autoembed.cc/embed/movie/${tmdbId}`;
         case '2embed': return `https://www.2embed.cc/embed/${tmdbId}`;
-        case 'multiembed': return `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1`;
-        case 'superflix': return `https://mega.smashystream.com/movie/${tmdbId}`;
         case 'peachify': return `https://www.2embed.to/embed/tmdb/movie?id=${tmdbId}`;
-        default: return `https://vidlink.pro/movie/${tmdbId}`;
+        case 'superflix': return `https://mega.smashystream.com/movie/${tmdbId}`;
+        case 'multiembed': return `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1`;
+        default: return `https://vidsrc.mov/embed/movie/${tmdbId}`;
       }
     }
   };
@@ -169,7 +145,7 @@ export default function IntegratedPlayer({ title, backdrop, trailerKey, tmdbId, 
   const currentSeasonData = seasons.find((s: any) => s.season_number === activeSeason);
   const episodeCount = currentSeasonData?.episode_count || 0;
   
-  // Generate a fake array of episodes based on the episode count since we only have the count from getDetails
+  // Generate an array of episodes based on the episode count from getDetails
   const episodeList = Array.from({ length: episodeCount }, (_, i) => i + 1);
 
   const toggleFullscreen = () => {
@@ -211,6 +187,7 @@ export default function IntegratedPlayer({ title, backdrop, trailerKey, tmdbId, 
               title={`${title} Player`}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
               allowFullScreen={true}
+              referrerPolicy="origin"
             ></iframe>
             
             {/* Native Fullscreen Hover Button */}
@@ -222,7 +199,7 @@ export default function IntegratedPlayer({ title, backdrop, trailerKey, tmdbId, 
               <Maximize className="w-5 h-5" />
             </button>
 
-            {/* Play overlay — click to jump straight into the video fullscreen */}
+            {/* Play overlay */}
             {iframeOverlayVisible && (
               <div
                 className="absolute inset-0 z-10 flex items-center justify-center cursor-pointer group"
@@ -239,17 +216,12 @@ export default function IntegratedPlayer({ title, backdrop, trailerKey, tmdbId, 
 
         {/* Server Selection Section */}
         <div className="bg-[#222255]/40 border border-white/5 rounded-xl p-4 md:p-6 flex flex-col gap-4">
-          {/* Active Anti-Popup Protection Banner */}
-          <div className="flex items-start gap-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-lg p-3 text-xs md:text-sm font-medium">
-            <ShieldCheck className="w-5 h-5 flex-shrink-0 text-emerald-400 mt-0.5" />
-            <div className="flex flex-col gap-1">
-              <p>
-                <span className="font-bold text-white">Built-in Anti-Popup Shield Active</span> — Player clicks, ads, and redirection popups are automatically blocked.
-              </p>
-              <p className="text-emerald-300/90 text-xs leading-relaxed">
-                💡 <span className="font-semibold text-emerald-200">Viewer Note:</span> If a third-party video server opens an ad tab when you click play, simply close that tab and switch the player to <span className="font-semibold text-white underline decoration-emerald-400/50">Full Screen</span> for an ad-free viewing experience!
-              </p>
-            </div>
+          {/* Note Banner */}
+          <div className="flex items-center gap-2.5 bg-amber-500/10 border border-amber-500/20 text-amber-300 rounded-lg p-3 text-xs md:text-sm font-medium">
+            <TriangleAlert className="w-4 h-4 flex-shrink-0 text-amber-400" />
+            <p>
+              For best experience, use <span className="font-bold text-white">uBlock Origin</span> or <span className="font-bold text-white">Brave Browser</span>
+            </p>
           </div>
 
           <div>
