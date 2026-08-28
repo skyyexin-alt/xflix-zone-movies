@@ -7,7 +7,6 @@ import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import { Providers } from "./Providers";
 import InstallAppButton from "@/components/ui/InstallAppButton";
 import StickySocialSidebar from "@/components/ui/StickySocialSidebar";
-import AdsKeeperNotification from "@/components/ui/AdsKeeperNotification";
 import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
@@ -104,19 +103,11 @@ export default function RootLayout({
           strategy="afterInteractive"
         />
 
-        {/* Adskeeper In-Site Notification Ads Loader */}
-        <Script
-          src="https://jsc.adskeeper.com/site/1106781.js"
-          strategy="afterInteractive"
-        />
-
         <Providers>
           <Navbar />
           <main className="min-h-screen">
             {children}
           </main>
-          {/* Adskeeper In-Site Notification Global Widget */}
-          <AdsKeeperNotification widgetId="2066162" />
           <InstallAppButton />
           <StickySocialSidebar />
           <Footer />
