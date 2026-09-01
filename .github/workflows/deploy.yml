@@ -63,12 +63,17 @@ jobs:
             pm2 delete xflix-zone-movies || true
             fuser -k 3000/tcp || true
 
-            PORT=3000 pm2 start npm --name "nextzone-movies" -- start -- -p 3000
+            # Start production server using ecosystem.config.js with fallback
+            pm2 start ecosystem.config.js || pm2 start "npx next start -p 3000" --name "nextzone-movies"
             pm2 save --force || true
 
             # Clear nginx cache and restart
             rm -rf /var/cache/nginx/* || true
             systemctl reload nginx || systemctl restart nginx || true
+
+            echo "Verifying server on port 3000..."
+            sleep 3
+            curl -sI http://127.0.0.1:3000 | head -n 5 || pm2 status
 
             echo "=================================================="
             echo "🎉 DEPLOYMENT SUCCESSFUL!"
