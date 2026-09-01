@@ -27,7 +27,7 @@ jobs:
             echo "🚀 AUTO-DEPLOYING NEXTZONE MOVIES ON HETZNER"
             echo "=================================================="
             
-            # Find the actual directory where xflix / nextzone is located
+            # Find or initialize the actual directory where xflix / nextzone is located
             TARGET_DIR=""
             for dir in "/var/www/nextzone-movies" "/var/www/xflix-zone-movies" "/var/www/xflix-zone" "/var/www/xflix" "/var/www/xflix.ink" "/var/www/movies.xflix.ink"; do
               if [ -d "$dir/.git" ]; then
@@ -40,27 +40,33 @@ jobs:
             if [ -z "$TARGET_DIR" ]; then
               TARGET_DIR="/var/www/nextzone-movies"
               mkdir -p "$TARGET_DIR"
+              git clone https://github.com/skyyexin-alt/xflix-zone-movies.git "$TARGET_DIR" || true
             fi
 
             cd "$TARGET_DIR"
             echo "Deploying in: $TARGET_DIR"
 
             git config --global --add safe.directory "$TARGET_DIR" || true
-            git fetch --all
+            git remote set-url origin https://github.com/skyyexin-alt/xflix-zone-movies.git || true
+            git fetch origin main || git fetch --all
             git reset --hard origin/main
 
             echo "NEXT_PUBLIC_TMDB_API_KEY=5d067b9d81cc3970f1365e1e9862ce6b" > .env.local
             echo "NEXT_PUBLIC_SITE_URL=https://xflix.ink" >> .env.local
 
+            # Ensure pm2 is available
+            which pm2 || npm install -g pm2 || true
+
             rm -rf .next public/sw.js public/workbox-*.js
             npm install
             npm run build
 
+            # Inspect active Nginx proxy ports
+            echo "--- Active Nginx Upstreams ---"
+            grep -rn "proxy_pass" /etc/nginx/sites-enabled/ /etc/nginx/conf.d/ || true
+
             # Stop all old processes (xflix, nextzone-movies, etc.) to free port 3000
-            pm2 delete nextzone-movies || true
-            pm2 delete xflix || true
-            pm2 delete xflix-zone || true
-            pm2 delete xflix-zone-movies || true
+            pm2 delete all || true
             fuser -k 3000/tcp || true
 
             # Start production server using ecosystem.config.js with fallback
@@ -72,8 +78,10 @@ jobs:
             systemctl reload nginx || systemctl restart nginx || true
 
             echo "Verifying server on port 3000..."
-            sleep 3
-            curl -sI http://127.0.0.1:3000 | head -n 5 || pm2 status
+            sleep 4
+            curl -sI http://127.0.0.1:3000 | head -n 8 || true
+            pm2 status
+            pm2 logs nextzone-movies --lines 15 --nostream || true
 
             echo "=================================================="
             echo "🎉 DEPLOYMENT SUCCESSFUL!"
