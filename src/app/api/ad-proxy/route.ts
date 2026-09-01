@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const parsed = new URL(targetUrl);
-    const allowedHosts = ["magsrv.com", "a.magsrv.com", "racketgutter.com", "yearlybeak.com"];
+    const allowedHosts = ["racketgutter.com", "yearlybeak.com"];
     
     const isAllowed = allowedHosts.some((host) => parsed.hostname.endsWith(host));
     if (!isAllowed) {

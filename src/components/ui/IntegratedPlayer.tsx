@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { TriangleAlert, Star, Play, ChevronDown, CheckCircle2, Maximize } from 'lucide-react';
 import CustomVideoPlayer from './CustomVideoPlayer';
-import VastPreRollPlayer from './VastPreRollPlayer';
 
 interface IntegratedPlayerProps {
   title: string;
@@ -51,25 +50,7 @@ export default function IntegratedPlayer({
   const [streamData, setStreamData] = useState<{ url: string, subs: any[] } | null>(null);
   const [isStreamLoading, setIsStreamLoading] = useState(false);
   const [iframeOverlayVisible, setIframeOverlayVisible] = useState(false);
-  const [vastAd, setVastAd] = useState<any | null>(null);
   const iframeContainerRef = useRef<HTMLDivElement>(null);
-
-  // Fetch ExoClick VAST in-stream video ad
-  useEffect(() => {
-    async function checkVastAd() {
-      try {
-        const res = await fetch('/api/vast');
-        const data = await res.json();
-        if (data.hasAd && data.mediaUrl) {
-          setVastAd(data);
-        }
-      } catch (err) {
-        // Silently skip ad on error
-      }
-    }
-
-    checkVastAd();
-  }, [tmdbId, activeSeason, activeEpisode]);
 
   // Fetch direct HLS stream URL asynchronously if available
   useEffect(() => {
@@ -101,10 +82,6 @@ export default function IntegratedPlayer({
 
   const handleIframePlay = () => {
     setIframeOverlayVisible(false);
-  };
-
-  const handleAdComplete = () => {
-    setVastAd(null);
   };
 
   const servers = [
@@ -159,12 +136,6 @@ export default function IntegratedPlayer({
         
         {/* Video Container */}
         <div className="relative w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl border border-white/5 group">
-          
-          {/* ExoClick VAST Pre-Roll Video Ad Overlay */}
-          {vastAd && (
-            <VastPreRollPlayer adData={vastAd} onAdComplete={handleAdComplete} />
-          )}
-
           {isStreamLoading ? (
             <div className="w-full h-full flex items-center justify-center">
               <div className="w-10 h-10 border-4 border-violet-500 border-t-transparent rounded-full animate-spin"></div>
